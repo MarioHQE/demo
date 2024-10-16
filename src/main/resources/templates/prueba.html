@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Verificar Rol</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <button id="verificar-rol-btn">Verificar Rol</button>
+    <button id="logout-btn">Cerrar Sesión</button>
+    <script>
+        // Obtener el token de la sesión desde Thymeleaf
+        var token = '[[${session.token}]]';
+
+        $('#verificar-rol-btn').on('click', function () {
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:3600/empleado/verificarRol",
+                dataType: "json",
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+              
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
+        $('#logout-btn').on('click', function () {
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:3600/cerrar",
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                success: function () {
+                    // Redirigir a la página de inicio de sesión o a otra página después del logout
+                    window.location.href = "/login_admin";
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

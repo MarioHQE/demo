@@ -1,0 +1,77 @@
+.todo{
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../img/fondo-reservas.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    color: white;
+}
+
+#div1 {
+    border: 2px solid white;
+    padding: 20px;
+    text-align: center;
+    width: 56%;
+    
+    border-radius: 10px;
+    margin-right: 25px; 
+}
+
+
+.circulo {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5px;
+    border: 2px solid red;
+    cursor: pointer;
+}
+
+.circulo label {
+    position: absolute;
+    bottom: -30px; 
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-size: 1.2em;
+}
+
+
+
+
+/*fin de cantidad de personas */
+
+
+
+/*-----------*/
+#div2{
+    border: 2px solid white;
+    padding: 10px;
+    text-align: center;
+
+    
+    border-radius: 10px;
+    
+}
+
+
+/*-------------*/
+
+.d-grid{
+    margin: 15px;
+}
+.btn{
+    border: 2px solid red;
+    color: white;
+}
+.btn:hover{
+    background-color: red;
+}
+
+#razon{
+    margin-top: 10px; 
+  }
