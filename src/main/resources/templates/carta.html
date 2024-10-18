@@ -65,15 +65,15 @@
         <div class="container mt-4">
             <div class="row">
 
-                <div class='col-lg-4 col-md-6 mb-4'>
-                    <div th:each="plato:${platos}" class='card'>
-                        <img class='card-img-top img-fluid' src='img/causadiana.jpg' alt='Card image'>
+                <div th:each="plato:${platos}" class='col-lg-4 col-md-6 mb-4'>
+                    <div  class='card'>
+                        <img class='card-img-top img-fluid' th:src="@{'uploads/' + ${plato.foto}}" alt='Card image'>
                         <div class='card__content'>
-                            <p th:text="${plato.nombre}" class='card__title' > </p>
+                            <p th:text="${plato.nombre}" class='card__title'> </p>
                             <p class='card__description'>
                                 <span> [[${plato.descripcion}]] </span>
-                                <span >[[${plato.nombre}]]</span>
-                                <span >[[${plato.precio}]]</span>
+                                <span>[[${plato.nombre}]]</span>
+                                <span>[[${plato.precio}]]</span>
                             </p>
                         </div>
                     </div>

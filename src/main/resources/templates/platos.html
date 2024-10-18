@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -80,7 +79,7 @@
                         </tr>
                     </thead>
                     <tbody id="myTable">
-                       
+
                     </tbody>
                 </table>
             </div>
@@ -98,19 +97,19 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form method="post" enctype="multipart/form-data">
-                           
+                        <form id="formGuardarPlato" method="post" enctype="multipart/form-data">
+
                             <div class="mb-3">
                                 <label class="form-label">Nombre</label>
-                                <input name="Nombre" type="text" class="form-control" require>
+                                <input name="nombre" type="text" class="form-control" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Imagen</label>
-                                <input type="file" name="imagen" class="form-control" require>
+                                <input type="file" name="foto" class="form-control" require>
                             </div>
                             <label> Descripción</label>
                             <div class="form-floating mb-3">
-                                <textarea class="form-control" name="Descripcion" rows="3" require></textarea>
+                                <textarea class="form-control" name="descripcion" rows="3" require></textarea>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label" for="Precio">Precio</label>
@@ -173,6 +172,7 @@
         <script src="js/actuplato.js"></script>
         <script>
             /*para filtrar */
+            var token = '[[${session.token}]]';
             $(document).ready(function () {
                 $("#myInput").on("keyup", function () {
                     var value = $(this).val().toLowerCase();
@@ -183,6 +183,34 @@
             });
 
             /*pasar los datos al modal */
+            $(document).ready(function () {
+                $('form').on('submit', function (e) {
+                    e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+                    // Crear un FormData para manejar el archivo y los otros datos
+                    var formData = new FormData(this);
+
+                    $.ajax({
+                        url: '/plato/guardar',
+                        type: 'POST',
+                        data: formData,
+                        headers:{
+                            "Authorization": 'Bearer ' + token
+                        },
+                        contentType: false, // No establecer ningún tipo de contenido
+                        processData: false, // No procesar los datos (especialmente necesario para archivos)
+                        success: function (response) {
+                            alert('Plato guardado exitosamente');
+                            // Aquí podrías recargar la lista de platos o cerrar el modal
+                            $('#formagre').modal('hide');
+                            location.reload(); // O recargar los platos en la tabla si no deseas recargar toda la página
+                        },
+                        error: function (error) {
+                            alert('Error al guardar el plato');
+                        }
+                    });
+                });
+            });
 
 
             document.querySelectorAll(".btn-edit").forEach((btn) => {
