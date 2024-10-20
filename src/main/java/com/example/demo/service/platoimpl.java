@@ -40,7 +40,7 @@ public class platoimpl implements platoservice {
         // Validar que todos los campos están completos
         if (validate(nombre, descripcion, precio)) {
             if (!imagen.isEmpty()) {
-                Path directorioimagenes = Paths.get("src//main//resources//templates/uploads");
+                Path directorioimagenes = Paths.get("src//main//resources//static/uploads");
                 String rutaabsoluta = directorioimagenes.toFile().getAbsolutePath();
                 try {
                     byte[] bytesimg = imagen.getBytes();
