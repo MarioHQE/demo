@@ -14,4 +14,8 @@ public interface platoservice {
     public ArrayList<Plato> traerplatos();
 
     public ResponseEntity<String> guardar(MultipartFile imagen, String nombre, String descripcion, String precio);
+
+    public ResponseEntity<String> actualizar(String id, String nombre, String descripcion, String precio,
+            MultipartFile imagen);
+
 }

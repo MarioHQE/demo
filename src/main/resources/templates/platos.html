@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -12,6 +12,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="css/menu_login.css">
 
+    <style>
+        .img-custom {
+            width: 40px;
+            height: 40px;
+        }
+    </style>
 </head>
 
 <body>
@@ -79,7 +85,26 @@
                         </tr>
                     </thead>
                     <tbody id="myTable">
-
+                        <tr th:each="plato:${platos}">
+                            <th th:text="${plato.Id_plato}"></th>
+                            <th th:text="${plato.nombre}"></th>
+                            <th> <img class='card-img-top img-fluid img-custom' th:src="@{'uploads/' + ${plato.foto}}"
+                                    alt='Card image'></th>
+                            <th th:text="${plato.descripcion}"></th>
+                            <th th:text="${plato.precio}"></th>
+                            <th>
+                                <button type="button" class="btn btn-warning btn-edit" th:attr="data-id=${plato.Id_plato}, 
+             data-nombre=${plato.nombre}, 
+             data-precio=${plato.precio}, 
+             data-descripcion=${plato.descripcion}" data-bs-toggle="modal" data-bs-target="#formactu">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </button>
+                                <button type="button" class="btn btn-danger"
+                                    onclick="eliminarPlato('[[${plato.Id_plato}]]')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </th>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -145,7 +170,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Imagen</label>
-                                <input type="file" id="actuimagen" name="actuimagen" class="form-control">
+                                <input type="file" id="actufoto" name="actufoto" class="form-control">
                             </div>
                             <label> Descripción</label>
                             <div class="form-floating mb-3">
@@ -184,7 +209,7 @@
 
             /*pasar los datos al modal */
             $(document).ready(function () {
-                $('form').on('submit', function (e) {
+                $('#formGuardarPlato').on('submit', function (e) {
                     e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
                     // Crear un FormData para manejar el archivo y los otros datos
@@ -194,7 +219,7 @@
                         url: '/plato/guardar',
                         type: 'POST',
                         data: formData,
-                        headers:{
+                        headers: {
                             "Authorization": 'Bearer ' + token
                         },
                         contentType: false, // No establecer ningún tipo de contenido
@@ -210,7 +235,37 @@
                         }
                     });
                 });
+
+                $('#updateForm').on('submit', function (e) {
+                    e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+                    var formData = new FormData(this);
+                    var idPlato = $('#id_plato').val(); // Obtener el ID del plato
+
+                    $.ajax({
+                        url: '/plato/actualizar',
+                        type: 'POST',
+                        data: formData,
+                        headers: {
+                            "Authorization": 'Bearer ' + token
+                        },
+                        contentType: false, // No establecer ningún tipo de contenido
+                        processData: false, // No procesar los datos
+                        success: function (response) {
+                            alert('Plato actualizado exitosamente');
+                            $('#formactu').modal('hide');
+                            location.reload(); // Recargar la página para mostrar los cambios
+                        },
+                        error: function (error) {
+                            alert('Error al actualizar el plato');
+                        }
+                    });
+                });
             });
+
+
+
+
 
 
             document.querySelectorAll(".btn-edit").forEach((btn) => {

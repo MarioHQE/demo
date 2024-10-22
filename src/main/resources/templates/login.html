@@ -66,73 +66,37 @@
         $(document).ready(function () {
             $('#loginForm').on('submit', function (event) {
                 event.preventDefault(); // Previene el comportamiento por defecto del formulario
-                if (localStorage.getItem('authToken') === null) {
-                    $.ajax({
-                        url: 'http://localhost:3600/empleado/login',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            email: $('input[name="usuario"]').val(),
-                            contrasena: $('input[name="password"]').val()
-                        }),
-                        success: function (response) {
-                            // Asegúrate de que la respuesta sea un objeto y extrae el token
-                            try {
-                                const data = JSON.parse(response); // Parsear la respuesta JSON
-                                if (data.token) {
-                                    // Guarda el token en localStorage
-                                    
-                                    localStorage.setItem('authToken', data.token);
-                                    window.location.href = '/index'; // Redirige a la página deseada
-                                } else {
-                                    // Muestra mensaje de error
-                                    $('#error').text(data.mensaje);
-                                }
-                            } catch (error) {
-                                $('#error').text("Error al procesar la respuesta del servidor.");
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            // Maneja errores aquí
-                            $('#error').text("Error: " + error);
-                        }
-                    });
-                } else {
-                    $.ajax({
-                        url: 'http://localhost:3600/empleado/login',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        headers: {
-                            'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                $.ajax({
+                    url: 'http://localhost:3600/empleado/login',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        email: $('input[name="usuario"]').val(),
+                        contrasena: $('input[name="password"]').val()
+                    }),
+                    success: function (response) {
+                        // Asegúrate de que la respuesta sea un objeto y extrae el token
+                        try {
+                            const data = JSON.parse(response); // Parsear la respuesta JSON
+                            if (data.token) {
+                                // Guarda el token en localStorage
 
-                        },
-                        data: JSON.stringify({
-                            email: $('input[name="usuario"]').val(),
-                            contrasena: $('input[name="password"]').val()
-                        }),
-                        success: function (response) {
-                            // Asegúrate de que la respuesta sea un objeto y extrae el token
-                            try {
-                                const data = JSON.parse(response); // Parsear la respuesta JSON
-                                if (data.token) {
-                                    // Guarda el token en localStorage
-                                    localStorage.setItem('authToken', data.token);
-                                    window.location.href = '/index'; // Redirige a la página deseada
-                                } else {
-                                    // Muestra mensaje de error
-                                    $('#error').text(data.mensaje);
-                                }
-                            } catch (error) {
-                                $('#error').text("Error al procesar la respuesta del servidor.");
+                                localStorage.setItem('authToken', data.token);
+                                window.location.href = '/index'; // Redirige a la página deseada
+                            } else {
+                                // Muestra mensaje de error
+                                $('#error').text(data.mensaje);
                             }
-                        },
-                        error: function (xhr, status, error) {
-                            // Maneja errores aquí
-                            $('#error').text("Error: " + error);
+                        } catch (error) {
+                            $('#error').text("Error al procesar la respuesta del servidor.");
                         }
-                    });
+                    },
+                    error: function (xhr, status, error) {
+                        // Maneja errores aquí
+                        $('#error').text("Error: " + error);
+                    }
+                });
 
-                }
 
             });
         });

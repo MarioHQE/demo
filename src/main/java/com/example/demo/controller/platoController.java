@@ -37,4 +37,15 @@ public class platoController {
         return platodao.guardar(imagen, nombre, descripcion, precio);
     }
 
+    @PostMapping("/actualizar")
+    public ResponseEntity<String> actualizarPlato(
+            @RequestParam("id_plato") String id,
+            @RequestParam("actuNombre") String nombre,
+            @RequestParam("actuDescripcion") String descripcion,
+            @RequestParam("actuprecio") String precio,
+            @RequestParam("actufoto") MultipartFile imagen) {
+
+        return platodao.actualizar(id, nombre, descripcion, precio, imagen);
+    }
+
 }

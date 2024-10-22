@@ -104,7 +104,8 @@ public class RestController {
     public String platos(Model modelo, HttpServletResponse response, HttpSession session) {
         response.setHeader("Authorization", "Bearer " +
                 session.getAttribute("token"));
-
+        ArrayList<Plato> traerPlatos = platodao.traerplatos();
+        modelo.addAttribute("platos", traerPlatos);
         return "platos";
     }
 

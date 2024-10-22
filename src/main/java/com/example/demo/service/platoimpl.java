@@ -81,4 +81,49 @@ public class platoimpl implements platoservice {
                 precio == null || precio.isEmpty());
     }
 
+    @Override
+    public ResponseEntity<String> actualizar(String id, String nombre, String descripcion, String precio,
+            MultipartFile imagen) {
+        // Traer el plato existente por ID
+        Plato platoexistente = platodao.findById(Integer.parseInt(id));
+        log.info("plato existente");
+        if (platoexistente != null) {
+
+            // Actualizar campos de texto
+            platoexistente.setNombre(nombre);
+            platoexistente.setDescripcion(descripcion);
+            platoexistente.setPrecio(Double.parseDouble(precio));
+
+            // Si se seleccionó una nueva imagen, actualizarla
+            if (!imagen.isEmpty()) {
+                Path directorioimagenes = Paths.get("src//main//resources//static/uploads");
+                String rutaabsoluta = directorioimagenes.toFile().getAbsolutePath();
+                try {
+                    byte[] bytesimg = imagen.getBytes();
+                    Path rutacompletoa = Paths.get(rutaabsoluta + "//" + imagen.getOriginalFilename());
+                    Files.write(rutacompletoa, bytesimg);
+                    platoexistente.setFoto(imagen.getOriginalFilename());
+                    log.info("dentro de la imagen aa ver si funciona");
+                } catch (IOException e) {
+                    log.error("Error al guardar la imagen: ", e);
+                    return new ResponseEntity<>("Error al guardar la imagen", HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+
+            // Guardar los cambios en la base de datos
+            platodao.save(platoexistente);
+            return new ResponseEntity<String>("Plato actualizado correctamente", HttpStatus.OK);
+
+        } else {
+            return new ResponseEntity<String>("No se ha encontrado el plato", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // private boolean validateActu(String actuNombre, String actuDescripcion,
+    // String actuprecio) {
+    // return !(actuNombre == null || actuNombre.isEmpty() ||
+    // actuDescripcion == null || actuDescripcion.isEmpty() ||
+    // actuprecio == null || actuprecio.isEmpty());
+    // }
+
 }
