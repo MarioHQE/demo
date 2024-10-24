@@ -110,7 +110,7 @@ public class RestController {
     }
 
     @GetMapping("/contacto")
-    public String getMethodName(Model modelo, HttpServletResponse response, HttpSession session) {
+    public String contacto(Model modelo, HttpServletResponse response, HttpSession session) {
         response.setHeader("Authorization", "Bearer " +
                 session.getAttribute("token"));
         return "contacto";
