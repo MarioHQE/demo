@@ -109,6 +109,13 @@ public class RestController {
         return "platos";
     }
 
+    @GetMapping("/contacto")
+    public String getMethodName(Model modelo, HttpServletResponse response, HttpSession session) {
+        response.setHeader("Authorization", "Bearer " +
+                session.getAttribute("token"));
+        return "contacto";
+    }
+
     @PostMapping("/cerrar")
     public ResponseEntity<String> logout(HttpSession session) {
         // Eliminar el token y cerrar la sesión

@@ -6,11 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADMIN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="css/menu_login.css">
+
 
     <style>
         .img-custom {
@@ -85,7 +84,7 @@
                         </tr>
                     </thead>
                     <tbody id="myTable">
-                        <tr th:each="plato:${platos}">
+                        <tr th:each="plato:${platos}" th:attr="data-id=${plato.Id_plato}">
                             <th th:text="${plato.Id_plato}"></th>
                             <th th:text="${plato.nombre}"></th>
                             <th> <img class='card-img-top img-fluid img-custom' th:src="@{'uploads/' + ${plato.foto}}"
@@ -99,8 +98,8 @@
              data-descripcion=${plato.descripcion}" data-bs-toggle="modal" data-bs-target="#formactu">
                                     <i class="bi bi-pencil-square"></i> Editar
                                 </button>
-                                <button type="button" class="btn btn-danger"
-                                    onclick="eliminarPlato('[[${plato.Id_plato}]]')">
+                                <button type="button" class="btn btn-danger eliminar "
+                                    th:attr="data-id=${plato.Id_plato}">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </button>
                             </th>
@@ -109,194 +108,112 @@
                 </table>
             </div>
         </div>
+    </div>
 
 
 
 
-        <div class="modal" id="formagre">
-            <div class="modal-dialog">
-                <div class="modal-content">
+    <div class="modal" id="formagre">
+        <div class="modal-dialog">
+            <div class="modal-content">
 
-                    <div class="modal-header">
-                        <h4 class="modal-title">Agregar Plato</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="formGuardarPlato" method="post" enctype="multipart/form-data">
-
-                            <div class="mb-3">
-                                <label class="form-label">Nombre</label>
-                                <input name="nombre" type="text" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Imagen</label>
-                                <input type="file" name="foto" class="form-control" require>
-                            </div>
-                            <label> Descripción</label>
-                            <div class="form-floating mb-3">
-                                <textarea class="form-control" name="descripcion" rows="3" require></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="Precio">Precio</label>
-                                <input type="number" name="precio" class="form-control" require>
-
-
-                            </div>
-                            <button name="registro" type="submit" class="btn btn-primary">Agregar</button>
-                        </form>
-                    </div>
-
-
+                <div class="modal-header">
+                    <h4 class="modal-title">Agregar Plato</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-            </div>
+                <div class="modal-body">
+                    <form id="formGuardarPlato" method="post" enctype="multipart/form-data">
 
-        </div>
-        <div class="modal" id="formactu">
-            <div class="modal-dialog">
-                <div class="modal-content">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input name="nombre" type="text" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Imagen</label>
+                            <input type="file" name="foto" class="form-control" require>
+                        </div>
+                        <label> Descripción</label>
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" name="descripcion" rows="3" require></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="Precio">Precio</label>
+                            <input type="number" name="precio" class="form-control" require>
 
-                    <div class="modal-header">
-                        <h4 class="modal-title">Actualizar Plato</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="updateForm" method="post" enctype="multipart/form-data">
 
-                            <input type="hidden" name="id_plato" id="id_plato">
-                            <!-- Existing form fields -->
-                            <div class="mb-3">
-                                <label class="form-label">Nombre</label>
-                                <input id="actuNombre" name="actuNombre" type="text" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Imagen</label>
-                                <input type="file" id="actufoto" name="actufoto" class="form-control">
-                            </div>
-                            <label> Descripción</label>
-                            <div class="form-floating mb-3">
-                                <textarea id="actuDescripcion" class="form-control" name="actuDescripcion"
-                                    placeholder="Leave a comment here"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Precio</label>
-                                <input type="number" id="actuprecio" name="actuprecio" class="form-control">
-                            </div>
-                            <button name="actualizar" type="submit" class="btn btn-primary">Actualizar</button>
-
-                        </form>
-                    </div>
-
+                        </div>
+                        <button name="registro" type="submit" class="btn btn-primary">Agregar</button>
+                    </form>
                 </div>
+
+
             </div>
         </div>
 
+    </div>
+    <div class="modal" id="formactu">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Actualizar Plato</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateForm" method="post" enctype="multipart/form-data">
+
+                        <input type="hidden" name="id_plato" id="id_plato">
+                        <!-- Existing form fields -->
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input id="actuNombre" name="actuNombre" type="text" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Imagen</label>
+                            <input type="file" id="actufoto" name="actufoto" class="form-control">
+                        </div>
+                        <label> Descripción</label>
+                        <div class="form-floating mb-3">
+                            <textarea id="actuDescripcion" class="form-control" name="actuDescripcion"
+                                placeholder="Leave a comment here"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Precio</label>
+                            <input type="number" id="actuprecio" name="actuprecio" class="form-control">
+                        </div>
+                        <button name="actualizar" type="submit" class="btn btn-primary">Actualizar</button>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
 
-        <script src="js/menu_login.js"></script>
-        <script src="js/actuplato.js"></script>
-        <script>
-            /*para filtrar */
-            var token = '[[${session.token}]]';
-            $(document).ready(function () {
-                $("#myInput").on("keyup", function () {
-                    var value = $(this).val().toLowerCase();
-                    $("#myTable tr").filter(function () {
-                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                    });
+
+    <script>
+        var token = '[[${session.token}]]';
+
+        /*para filtrar */
+        $(document).ready(function () {
+            $("#myInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#myTable tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 });
             });
+        });
 
-            /*pasar los datos al modal */
-            $(document).ready(function () {
-                $('#formGuardarPlato').on('submit', function (e) {
-                    e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
-
-                    // Crear un FormData para manejar el archivo y los otros datos
-                    var formData = new FormData(this);
-
-                    $.ajax({
-                        url: '/plato/guardar',
-                        type: 'POST',
-                        data: formData,
-                        headers: {
-                            "Authorization": 'Bearer ' + token
-                        },
-                        contentType: false, // No establecer ningún tipo de contenido
-                        processData: false, // No procesar los datos (especialmente necesario para archivos)
-                        success: function (response) {
-                            alert('Plato guardado exitosamente');
-                            // Aquí podrías recargar la lista de platos o cerrar el modal
-                            $('#formagre').modal('hide');
-                            location.reload(); // O recargar los platos en la tabla si no deseas recargar toda la página
-                        },
-                        error: function (error) {
-                            alert('Error al guardar el plato');
-                        }
-                    });
-                });
-
-                $('#updateForm').on('submit', function (e) {
-                    e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
-
-                    var formData = new FormData(this);
-                    var idPlato = $('#id_plato').val(); // Obtener el ID del plato
-
-                    $.ajax({
-                        url: '/plato/actualizar',
-                        type: 'POST',
-                        data: formData,
-                        headers: {
-                            "Authorization": 'Bearer ' + token
-                        },
-                        contentType: false, // No establecer ningún tipo de contenido
-                        processData: false, // No procesar los datos
-                        success: function (response) {
-                            alert('Plato actualizado exitosamente');
-                            $('#formactu').modal('hide');
-                            location.reload(); // Recargar la página para mostrar los cambios
-                        },
-                        error: function (error) {
-                            alert('Error al actualizar el plato');
-                        }
-                    });
-                });
-            });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="js/menu_login.js"></script>
+    <script src="js/actuplato.js"></script>
+    <script defer src="js/plato.js"></script>
 
 
-
-
-
-
-            document.querySelectorAll(".btn-edit").forEach((btn) => {
-                btn.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    var id = btn.getAttribute("data-id");
-                    let id_oculto = document.getElementById("id_plato");
-                    let nombre = document.getElementById("actuNombre");
-                    var name = btn.getAttribute("data-nombre");
-                    let precio = document.getElementById("actuprecio");
-                    var price = btn.getAttribute("data-precio");
-                    let descripcion = document.getElementById("actuDescripcion");
-                    var description = btn.getAttribute("data-descripcion");
-
-
-
-                    precio.value = price;
-                    descripcion.value = description;
-                    nombre.value = name;
-
-
-                    id_oculto.value = id;
-
-
-                    // Obtener otros valores del botón y asignarlos a los campos del formulario
-
-                    // Para el campo de la imagen, podrías necesitar manejarlo de manera diferente dependiendo de tus necesidades
-                    console.log(id);
-                });
-            })
-        </script>
 </body>
 
 

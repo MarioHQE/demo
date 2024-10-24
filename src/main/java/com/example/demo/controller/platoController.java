@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
@@ -46,6 +47,12 @@ public class platoController {
             @RequestParam("actufoto") MultipartFile imagen) {
 
         return platodao.actualizar(id, nombre, descripcion, precio, imagen);
+    }
+
+    @DeleteMapping("/eliminar")
+    public ResponseEntity<String> eliminar(@RequestParam("id_plato") String id) {
+
+        return platodao.eliminar(id);
     }
 
 }

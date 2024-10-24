@@ -18,4 +18,5 @@ public interface platoservice {
     public ResponseEntity<String> actualizar(String id, String nombre, String descripcion, String precio,
             MultipartFile imagen);
 
+    public ResponseEntity<String> eliminar(String id);
 }
