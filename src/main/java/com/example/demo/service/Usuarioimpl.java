@@ -111,6 +111,7 @@ public class Usuarioimpl implements UsuarioService {
                             usuarioDetailsService.getUserDetail());
                     session.setAttribute("username", usuarioDetailsService.getUserDetail().getNombre());
                     session.setAttribute("rol", usuarioDetailsService.getUserDetail().getRol());
+                    session.setAttribute("id_usuario", usuarioDetailsService.getUserDetail().getId_usuario());
                     response.setHeader("Authorization", "Bearer " + token);
                     session.setAttribute("token", token);
                     return new ResponseEntity<String>("{\"token\":\"" + token + "\"}",

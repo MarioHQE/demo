@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REST'DIANA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/reservas.css">
+</head>
+
+<body class="todo">
+    <div class="container">
+        <h2 class="titu mt-4 mb-4 text-center">BIENVENIDO</h2>
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-8" id="div1">
+                    <h2>Elije la cantidad de personas</h2>
+                    <div class="d-flex justify-content-center flex-wrap">
+                        <div class="circulo">
+                            <input type="radio" id="cantidad1" name="cantidad" value="1">
+                            <label for="cantidad1">1</label>
+                        </div>
+                        <div class="circulo">
+                            <input type="radio" id="cantidad2" name="cantidad" value="2">
+                            <label for="cantidad2">2</label>
+                        </div>
+                        <div class="circulo">
+                            <input type="radio" id="cantidad3" name="cantidad" value="3">
+                            <label for="cantidad3">3</label>
+                        </div>
+                        <div class="circulo">
+                            <input type="radio" id="cantidad4" name="cantidad" value="4">
+                            <label for="cantidad4">4</label>
+                        </div>
+                        <div class="circulo">
+                            <input type="radio" id="cantidad5" name="cantidad" value="5">
+                            <label for="cantidad5">5</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <h3 class="mt-3 mb-3">Fecha</h3>
+                        <input type="date" id="birthday" name="dia" class="form-control">
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <h3 class="mt-3 mb-3">Elige una hora</h3>
+                        <select class="form-select form-select-lg mb-3" aria-label="Large select example" name="hora">
+                            <option value="">Elegir una hora</option>
+                            <option value="11:00">11:00 am</option>
+                            <option value="12:00">12:00 pm</option>
+                            <option value="13:00">1:00 pm</option>
+                            <option value="14:00">2:00 pm</option>
+                            <option value="15:00">3:00 pm</option>
+                            <option value="16:00">4:00 pm</option>
+                            <option value="17:00">5:00 pm</option>
+                            <option value="18:00">6:00 pm</option>
+                        </select>
+                    </div>
+                    <div id="mesas-container" class="mt-4"></div>
+                </div>
+
+                <div class="col-md-4" id="div2">
+                    <h3>Completa tus datos y haz clic en "Ir al último paso"</h3>
+                    <div class="mb-3 mt-3">
+                        <label for="name" class="form-label">Nombre:</label>
+                        <input type="text" class="form-control" name="name" value="<?php echo isset($_SESSION["
+                            nombre"]) ? $_SESSION["nombre"] : "" ?>" required>
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label for="lastname" class="form-label">Apellidos:</label>
+                        <input type="text" class="form-control" name="lastname" value="<?php echo isset($_SESSION["
+                            apellido"]) ? $_SESSION["apellido"] : "" ; ?>" required>
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label for="correo" class="form-label">Email:</label>
+                        <input type="email" class="form-control" name="correo" value="<?php echo isset($_SESSION["
+                            correo"]) ? $_SESSION["correo"] : "" ?>" required>
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label for="numero" class="form-label">Número de teléfono:</label>
+                        <input type="number" class="form-control" name="numero" required>
+                    </div>
+
+                    <!-- <label for="group_doc" class="form-label">Tipo de documento</label>
+                    <select id="document-type" class="form-select" name="group_doc">
+                        <option value="">Selecciona un tipo de documento</option>
+                        <option value="boleta">Boleta</option>
+                        <option value="factura">Factura</option>
+                    </select>
+                    <div id="input-container" class="mt-3"></div>
+                    <div class="cont-termino mt-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="mySwitch" name="darkmode" value="yes"
+                                checked>
+                            <label class="form-check-label" for="mySwitch">Acepto los <a href="#">términos y
+                                    condiciones</a> de Rest'Diana.</label>
+                        </div>
+                    </div> -->
+                    <div class="d-grid">
+                        <button type="submit" name="reserva" class="btn btn-outline-white btn-block">Registrar
+                            reserva</button>
+                        <?php include("php/reservarmesa.php"); ?>
+                    </div>
+                    <div class="d-grid mt-3">
+                        <button type="button" class="btn btn-outline-dark btn-block"
+                            onclick="window.location.href='index.php'">Volver</button>
+                    </div>
+                    <div id="message" class="mt-3"></div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        var token = '[[${session.token}]]';
+
+        $(document).ready(function () {
+            function cargarMesas() {
+                var cantidad = $('input[name="cantidad"]:checked').val();
+                var fecha = $('input[name="dia"]').val();
+                var hora = $('select[name="hora"]').val();
+
+                if (cantidad && fecha && hora) {
+                    $.ajax({
+                        type: 'POST',
+                        url: 'http://localhost:3600/mesa/traer',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        data: JSON.stringify({
+                            capacidad: cantidad,
+                            fecha: fecha,
+                            hora: hora
+                        }),
+                        contentType: "application/json",
+                        success: function (response) {
+                            $('#mesas-container').html(response);
+                        }
+                    });
+
+                }
+            }
+
+            $('input[name="cantidad"]').change(cargarMesas);
+            $('input[name="dia"]').change(cargarMesas);
+            $('select[name="hora"]').change(cargarMesas);
+
+            $("#document-type").change(function () {
+                var selected = $(this).val();
+                $("#input-container").empty();
+                if (selected == "boleta") {
+                    $("#input-container").append('<input type="number" class="form-control" id="ruc" placeholder="Ingresa tu RUC" name="ruc">');
+                } else if (selected == "factura") {
+                    $("#input-container").append('<input type="number" class="form-control" id="number" placeholder="Ingresa tu RUC" name="number">');
+                    $("#input-container").append('<input type="text" class="form-control" id="razon" placeholder="Ingresa tu Nombre o razón social" name="razon">');
+                }
+            });
+        });
+        $("form").submit(function (event) {
+            event.preventDefault(); // Evitar el envío normal del formulario
+
+            var formData = $(this).serialize(); // Serializar los datos del formulario
+
+            $.ajax({
+                type: 'POST',
+                url: 'http://localhost:3600/reserva/crear',
+                data: formData,
+                headers:{
+                    'Authorization': 'Bearer '+ token
+                },
+                success: function (response) {
+                    $('#message').html('<div class="alert alert-success">' + response + '</div>');
+                    // Opcionalmente, puedes limpiar el formulario aquí
+                },
+                error: function (xhr) {
+                    $('#message').html('<div class="alert alert-danger">' + xhr.responseText + '</div>');
+                }
+            });
+        });
+
+
+    </script>
+</body>
+
+</html>

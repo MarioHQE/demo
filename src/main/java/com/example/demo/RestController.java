@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.service.Usuarioimpl;
+import com.example.demo.service.mesaimpl;
 import com.example.demo.service.platoimpl;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +34,9 @@ public class RestController {
     public jwtUtil jwtUtil;
     @Autowired
     private platoimpl platodao;
+
+    @Autowired
+    private mesaimpl mesadao;
 
     @GetMapping("/index")
     public String comienzo(Model modelo, HttpSession session, HttpServletResponse response) {
@@ -105,6 +109,7 @@ public class RestController {
         response.setHeader("Authorization", "Bearer " +
                 session.getAttribute("token"));
         ArrayList<Plato> traerPlatos = platodao.traerplatos();
+
         modelo.addAttribute("platos", traerPlatos);
         return "platos";
     }
@@ -114,6 +119,13 @@ public class RestController {
         response.setHeader("Authorization", "Bearer " +
                 session.getAttribute("token"));
         return "contacto";
+    }
+
+    @GetMapping("/reserva")
+    public String reserva(Model modelo, HttpServletResponse response, HttpSession session) {
+        response.setHeader("Authorization", "Bearer " +
+                session.getAttribute("token"));
+        return "reserva";
     }
 
     @PostMapping("/cerrar")
