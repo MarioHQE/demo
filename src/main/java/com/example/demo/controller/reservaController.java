@@ -46,11 +46,6 @@ public class reservaController {
         LocalTime hora = LocalTime.parse(horaStr);
         LocalDateTime fechaHora = LocalDateTime.of(fecha, hora);
 
-        // Validación de fecha y hora
-        if (fechaHora.isBefore(LocalDateTime.now())) {
-            return new ResponseEntity<>("La fecha y hora seleccionadas ya han pasado.", HttpStatus.BAD_REQUEST);
-        }
-
         // Llamar al servicio para crear la reserva
         return reservadao.crear(fechaHora, hora, nro_mesa, nombre, apellido, correo, telefono, id);
     }
