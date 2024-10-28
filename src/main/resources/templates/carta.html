@@ -40,6 +40,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="contacto">CONTACTO</a>
                         </li>
+                        <li class="nav-item"></li>
+                        <span th:if="${nombre != null}" class='ms-1 nav-link espacio'>Bienvenido, [[${nombre}]]</span>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#"><i class="bi bi-instagram"></i></a>
                         </li>
@@ -48,7 +51,7 @@
                         </li>
                     </ul>
                     <form class="d-flex">
-                        <button class="btn btn-outline-dark" type="button">RESERVAR</button>
+                        <a class="btn btn-outline-dark" href="http://localhost:3600/reserva">RESERVAR</a>
                     </form>
                 </div>
             </div>
@@ -66,7 +69,7 @@
             <div class="row">
 
                 <div th:each="plato:${platos}" class='col-lg-4 col-md-6 mb-4'>
-                    <div  class='card'>
+                    <div class='card'>
                         <img class='card-img-top img-fluid' th:src="@{'uploads/' + ${plato.foto}}" alt='Card image'>
                         <div class='card__content'>
                             <p th:text="${plato.nombre}" class='card__title'> </p>

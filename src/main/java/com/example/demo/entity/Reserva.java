@@ -13,12 +13,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
 @DynamicInsert
 @DynamicUpdate
+@NamedQuery(name = "Reserva.findbyestado", query = "SELECT r FROM Reserva r WHERE r.estado='cancelado' OR r.estado='confirmado' ORDER BY DATE(r.fecha), TIME(r.fecha)")
+@NamedQuery(name = "Reserva.atendidos", query = "SELECT r FROM Reserva r WHERE r.estado = 'atendido' ORDER BY DATE(r.fecha), TIME(r.fecha)")
 @Table(name = "reserva")
 @Data
 public class Reserva {

@@ -19,8 +19,8 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm">
-            <div class="container-fluid">
+        <nav class="navbar navbar-expand-sm" >
+            <div class="container-fluid ">
                 <a class="navbar-brand" href="#">
                     <img src="img/logoVillaHermosa.jpeg" alt="logo" class="img_logo">
                 </a>
@@ -41,6 +41,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="contacto">CONTACTO</a>
                         </li>
+                        <li class="nav-item"></li>
+                        <span th:if="${nombre != null}" class='ms-1 nav-link espacio'>Bienvenido, [[${nombre}]]</span>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#"><i class="bi bi-instagram"></i></a>
                         </li>
@@ -49,7 +52,7 @@
                         </li>
                     </ul>
                     <form class="d-flex">
-                        <button class="btn btn-outline-dark" type="button" href="http://localhost:3600/reserva\">RESERVAR</button>
+                        <a class="btn btn-outline-dark" href="http://localhost:3600/reserva">RESERVAR</a>
                     </form>
                 </div>
             </div>
@@ -98,9 +101,9 @@
     <div class="container">
         <footer class="py-3 my-4">
             <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-                <li class="nav-item"><a href="index.php" class="nav-link px-2 text-white">Villa Hermosa</a></li>
-                <li class="nav-item"><a href="chef.html" class="nav-link px-2 text-white">CHEF</a></li>
-                <li class="nav-item"><a href="carta.php" class="nav-link px-2 text-white">CARTA</a></li>
+                <li class="nav-item"><a href="index" class="nav-link px-2 text-white">Villa Hermosa</a></li>
+                <li class="nav-item"><a href="chef" class="nav-link px-2 text-white">CHEF</a></li>
+                <li class="nav-item"><a href="carta" class="nav-link px-2 text-white">CARTA</a></li>
                 <li class="nav-item"><a href="contacto" class="nav-link px-2 text-white">CONTACTO</a></li>
                 <li class="nav-item"><a href="#" class="nav-link px-2 text-white"><i class="bi bi-instagram"></i></a>
                 </li>

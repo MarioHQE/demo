@@ -1,6 +1,6 @@
 
 nav{
-    background-color: #eceae4;
+    background-color: #ffffff;
     animation: slideDown 1s ease forwards;
     opacity: 0; /* Inicialmente oculto para la transición */
 }
@@ -16,7 +16,6 @@ nav{
 }
 .nav-link,.btn{
     color: black;
-    font-weight: 550;
     font-family: 'Times New Roman', Times, serif;
 }
 .nav-link:hover{

@@ -9,20 +9,20 @@
     background-color: white;
 }
 .buton1{
-    background-color: rgba(0,205,254);
+    background-color: #38332b;
     color: white;
     width: 200px;
     margin-left: -20px;
 }
 .buton2{
-    background-color: rgb(255, 252, 252);
+    background-color:#b1afa0;
     color: black;
     width: 200px;
 }
-
+                          
 .buton1:hover{
     background-color: transparent;
-    border-color: rgba(0,205,254);
+    border-color: #38332b;
     color: white;
 }
 .buton2:hover{

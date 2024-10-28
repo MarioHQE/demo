@@ -1,13 +1,3 @@
-<?php
-session_start();
-if ($_SESSION["rol"] === "usuario") {
-    header("Location:index.php");
-} else if (!isset($_SESSION["nombre"])) {
-    header("Location:logform.php");
-} else if (isset($_SESSION["nombre"]) && $_SESSION['rol'] === 'admin') {
-    // Admin
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -40,27 +30,23 @@ if ($_SESSION["rol"] === "usuario") {
         </div>
         <ul class="navbar-nav flex-grow-1 pe-3">
             <li class="nav-item">
-                <a class="nav-link" href="platos.php"> <i class="bi bi-hypnotize"></i><span class="link-text">
-                        PLATOS</span></a>
+                <a class="nav-link" href="#"> <i class="bi bi-hypnotize"></i><span class="link-text"> PLATOS</span></a>
             </li>
-            <!-- <li class="nav-item">
-                <a class="nav-link" href="#" onclick="loadPage('platos.php')"> <i class="bi bi-hypnotize"></i><span class="link-text"> PLATOS</span></a>
-            </li> -->
             <li class="nav-item">
-                <a class="nav-link" href="tablausuario.php"><i class="bi bi-person-fill"></i> <span
+                <a class="nav-link" href="#"><i class="bi bi-person-fill"></i> <span
                         class="link-text">USUARIOS</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="tablareservas.php"><i class="bi bi-list-check"></i><span
-                        class="link-text">Reservas</span></a>
+                <a class="nav-link" href="#"><i class="bi bi-list-check"></i><span class="link-text">Reservas</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="php/logout.php"> <i class="bi bi-box-arrow-left"></i><span class="link-text"> SALIR</span></a>
+                <a class="nav-link" href="#"><i class="bi bi-box-arrow-left"></i><span class="link-text">
+                        SALIR</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="index.php"> <i class="bi bi-house-fill"></i><span class="link-text"> Pagina Principal</span></a>
+                <a class="nav-link" href="#"><i class="bi bi-house-fill"></i><span class="link-text"> Pagina
+                        Principal</span></a>
             </li>
-            
         </ul>
     </div>
 
@@ -72,97 +58,75 @@ if ($_SESSION["rol"] === "usuario") {
                         <div class="col-sm-4">
                             <h3>Lista de Reservas</h3>
                         </div>
-                        
-                       
                     </div>
                 </form>
-                <h1>Bienvenido, <?php echo $_SESSION['nombre']; ?></h1>
-                <div id="reservas-por-dia">
-                    <?php
-                    include ("php/conexion.php");
+                <h1 th:if="${nombre !=null}">Bienvenido, [[${nombre}]]</h1>
 
-                    $sql = "SELECT * FROM reserva WHERE estado='cancelado' OR estado='confirmado' ORDER BY DATE(fecha_hora), TIME(fecha_hora)";
-                    $stml = $conexion->prepare($sql);
-                    if ($stml->execute()) {
-                        $result = $stml->get_result();
-                        if ($result->num_rows > 0) {
-                            $current_date = '';
-                            while ($row = $result->fetch_assoc()) {
-                                $reserva_date = date('Y-m-d', strtotime($row['fecha_hora']));
-                                if ($reserva_date != $current_date) {
-                                    if ($current_date != '') {
-                                        echo "</tbody></table>";
-                                    }
-                                    $current_date = $reserva_date;
-                                    echo "<h4>Reservas para el día: " . date('d-m-Y', strtotime($current_date)) . "</h4>";
-                                    echo "<table class='table table-bordered text-center'>";
-                                    echo "<thead><tr><th>N°</th><th>Nombre</th><th>DNI</th><th>Hora</th><th>Número de invitados</th><th>Teléfono</th><th>Estado</th><th>Número de mesa</th></tr></thead>";
-                                    echo "<tbody>";
-                                }
-                                echo "<tr>";
-                                echo "<td>" . $row['id'] . "</td>";
-                                echo "<td>" . $row['nombre'] . "</td>";
-                                echo "<td>" . $row['dni'] . "</td>";
-                                echo "<td>" . date('H:i', strtotime($row['fecha_hora'])) . "</td>";
-                                echo "<td>" . $row['numero_invitados'] . "</td>";
-                                echo "<td>" . $row['telefono'] . "</td>";
-                                echo "<td>" . $row['estado'] . "</td>";
-                                echo "<td>" . $row['mesa_id'] . "</td>";
-                                echo "<td><a  href='?id_atender=" . intval($row['id']) . "' class='btn btn-primary'> <i class='bi bi-update'></i>Atender</a>";
-                                echo "<td><a  href='?id_confirmar=" . intval($row['id']) . "' class='btn btn-primary'> <i class='bi bi-update'></i>Confirmar</a>";
-                                echo "</tr>";
-                            }
-                            echo "</tbody></table>";
-                        }
-                    }
-                    include ("php/atender.php");
-                    include ("php/confirmar.php");
-                    ?>
+                <div id="reservas-por-dia">
+                    <h4>Reservas para el día: [[${fechaactual}]]</h4>
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Hora</th>
+                                <th>Correo</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                                <th>Número de mesa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filas de reservas vacías -->
+                            <tr th:each=" reserva : ${reservas}">
+                                <td th:text="${reserva.idReserva}"></td>
+                                <td th:text="${reserva.Nombre}"></td>
+                                <td th:text="${reserva.apellido}"></td>
+                                <td th:text="${reserva.fecha}"></td>
+                                <td th:text="${reserva.correo}"></td>
+                                <td th:text="${reserva.telefono}"></td>
+                                <td th:text="${reserva.estado}"></td>
+                                <td th:text="${reserva.Mesa.nroMesa}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
+
                 <div id="reservas-atendidas">
                     <h3>Reservas Atendidas</h3>
-                    <?php
-                    // Mostrar reservas atendidas
-                    $sql_atendidas = "SELECT * FROM reserva WHERE estado = 'atendido' ORDER BY DATE(fecha_hora), TIME(fecha_hora)";
-                    $stml_atendidas = $conexion->prepare($sql_atendidas);
-                    if ($stml_atendidas->execute()) {
-                        $result_atendidas = $stml_atendidas->get_result();
-                        if ($result_atendidas->num_rows > 0) {
-                            $current_date = '';
-                            while ($row = $result_atendidas->fetch_assoc()) {
-                                $reserva_date = date('Y-m-d', strtotime($row['fecha_hora']));
-                                if ($reserva_date != $current_date) {
-                                    if ($current_date != '') {
-                                        echo "</tbody></table>";
-                                    }
-                                    $current_date = $reserva_date;
-                                    echo "<h4>Reservas para el día: " . date('d-m-Y', strtotime($current_date)) . "</h4>";
-                                    echo "<table class='table table-bordered text-center'>";
-                                    echo "<thead><tr><th>N°</th><th>Nombre</th><th>DNI</th><th>Hora</th><th>Número de invitados</th><th>Teléfono</th><th>Estado</th><th>Número de mesa</th></tr></thead>";
-                                    echo "<tbody>";
-                                }
-                                echo "<tr>";
-                                echo "<td>" . $row['id'] . "</td>";
-                                echo "<td>" . $row['nombre'] . "</td>";
-                                echo "<td>" . $row['dni'] . "</td>";
-                                echo "<td>" . date('H:i', strtotime($row['fecha_hora'])) . "</td>";
-                                echo "<td>" . $row['numero_invitados'] . "</td>";
-                                echo "<td>" . $row['telefono'] . "</td>";
-                                echo "<td>" . $row['estado'] . "</td>";
-                                echo "<td>" . $row['mesa_id'] . "</td>";
-                                echo "</tr>";
-                            }
-                            echo "</tbody></table>";
-                        }
-                    }
-                    include ("php/atender.php");
-                    include ("php/confirmar.php");
-                    ?>
+                    <h4>Reservas para el día: [[${fechaactual}]]</h4>
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Hora</th>
+                                <th>Correo</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                                <th>Número de mesa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filas de reservas atendidas vacías -->
+                            <tr th:each=" reserva: ${reservasatendidas}">
+                                <td th:text="${reserva.idReserva}"></td>
+                                <td th:text="${reserva.Nombre}"></td>
+                                <td th:text="${reserva.apellido}"></td>
+                                <td th:text="${reservas.fecha}"></td>
+                                <td th:text="${reservas.correo}"></td>
+                                <td th:text="${reservas.telefono}"></td>
+                                <td th:text="${reservas.estado}"></td>
+                                <td th:text="${reservas.Mesa.nroMesa}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-
 
     <script src="js/menu_login.js"></script>
     <script src="js/actuplato.js"></script>

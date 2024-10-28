@@ -1,9 +1,8 @@
 package com.example.demo.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,6 +54,18 @@ public class reservaimpl implements reservaservice {
         reserva.setCorreo(correo);
         reserva.setEstado("pendiente");
         return reserva;
+    }
+
+    @Override
+    public List<Reserva> traerreserva() {
+        List<Reserva> reservas = reservadao.findbyestado();
+        return reservas;
+    }
+
+    @Override
+    public List<Reserva> atendido() {
+
+        return reservadao.atendidos();
     }
 
 }

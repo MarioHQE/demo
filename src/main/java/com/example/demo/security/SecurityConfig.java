@@ -43,7 +43,7 @@ public class SecurityConfig {
                         "/login_admin", "/reform", "/chef", "/contacto", "/carta", "/empleado/registrar")
                 .permitAll()
                 .requestMatchers("/prueba", "menu_login", "/platos", "/hola", "/img/**",
-                        "/css/**", "/js/**", "/favicon.ico", "/uploads/**", "/reserva")
+                        "/css/**", "/js/**", "/favicon.ico", "/uploads/**", "/reserva", "/reservas")
                 .permitAll().anyRequest().authenticated()
                 .and()
                 .sessionManagement()

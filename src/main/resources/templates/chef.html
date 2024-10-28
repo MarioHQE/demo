@@ -15,7 +15,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm" style="background-color: #071923;">
+        <nav class="navbar navbar-expand-sm">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">
                     <img src="img/DIANA_LOGO2.png" alt="logo" class="img_logo">
@@ -34,7 +34,10 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="carta">CARTA</a></li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="contacto.html">CONTACTO</a>
+                            <a class="nav-link text-white" href="contacto">CONTACTO</a>
+                        </li>
+                        <li class="nav-item"></li>
+                        <span th:if="${nombre != null}" class='ms-1 nav-link espacio'>Bienvenido, [[${nombre}]]</span>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-white" href="#"><i class="bi bi-instagram"></i></a>
@@ -44,7 +47,7 @@
                         </li>
                     </ul>
                     <form class="d-flex">
-                        <button class="btn btn-outline-light" type="button">RESERVAR</button>
+                        <a class="btn btn-outline-dark" href="http://localhost:3600/reserva">RESERVAR</a>
                     </form>
                 </div>
             </div>
@@ -74,7 +77,7 @@
                 <li class="nav-item"><a href="index" class="nav-link px-2 text-white">Villa Hermosa</a></li>
                 <li class="nav-item"><a href="chef" class="nav-link px-2 text-white">CHEF</a></li>
                 <li class="nav-item"><a href="carta" class="nav-link px-2 text-white">CARTA</a></li>
-                <li class="nav-item"><a href="contacto.html" class="nav-link px-2 text-white">CONTACTO</a></li>
+                <li class="nav-item"><a href="contacto" class="nav-link px-2 text-white">CONTACTO</a></li>
                 <li class="nav-item"><a href="#" class="nav-link px-2 text-white"><i class="bi bi-instagram"></i></a></li>
                 <li class="nav-item"><a href="#" class="nav-link px-2 text-white"><i class="bi bi-tiktok"></i></a></li>
               </ul>
