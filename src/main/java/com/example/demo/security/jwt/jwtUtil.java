@@ -60,4 +60,14 @@ public class jwtUtil {
         return (username.equals(userdetails.getUsername()) && !isTokenExpired(token));
     }
 
+    public String getusername(String token) {
+        String username = (String) extractAllClaims(token).get("name");
+        return username;
+    }
+
+    public String getrol(String token) {
+        String rol = (String) extractAllClaims(token).get("rol");
+        return rol;
+    }
+
 }

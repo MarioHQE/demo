@@ -10,8 +10,12 @@ import java.time.ZoneId;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
+
+import com.example.demo.dao.RolRepository;
 import com.example.demo.entity.Plato;
 import com.example.demo.entity.Reserva;
+import com.example.demo.entity.Rol;
 import com.example.demo.entity.Usuario;
 import com.example.demo.security.jwt.jwtFilter;
 import com.example.demo.security.jwt.jwtUtil;
@@ -26,8 +30,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
+@Slf4j
 public class RestController {
 
+    @Autowired
+    private RolRepository roldao;
     @Autowired
     private Usuarioimpl usuarioimpl;
 
@@ -112,10 +119,15 @@ public class RestController {
 
     @GetMapping("platos")
     public String platos(Model modelo, HttpServletResponse response, HttpSession session) {
+
         response.setHeader("Authorization", "Bearer " +
                 session.getAttribute("token"));
+        roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
+        Rol rol = roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
+
         if (session.getAttribute("token") != null) {
-            if (jwtFilter.isUser()) {
+            if (rol.getNombre().equals("ROLE_user")) {
+                log.info(jwtUtil.getrol((String) session.getAttribute("token")));
                 return "redirect:/index";
             }
         } else {
@@ -164,6 +176,7 @@ public class RestController {
     public ResponseEntity<String> logout(HttpSession session) {
         // Eliminar el token y cerrar la sesión
         session.invalidate();
+        jwtFilter.destroy();
 
         return new ResponseEntity<>("Sesión cerrada correctamente", HttpStatus.OK);
     }

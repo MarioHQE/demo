@@ -132,8 +132,4 @@ public class Usuarioimpl implements UsuarioService {
 
     }
 
-    public String getUsername() {
-        return jwtFilter.getCurrentUsername();
-    }
-
 }

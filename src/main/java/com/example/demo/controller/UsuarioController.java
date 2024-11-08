@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.security.jwt.jwtFilter;
+import com.example.demo.security.jwt.jwtUtil;
 import com.example.demo.service.Usuarioimpl;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,8 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UsuarioController {
 
     @Autowired
-    private jwtFilter jwtFilter;
-
+    private jwtUtil jwtUtil;
     @Autowired
     private Usuarioimpl usuarioimpl;
 
@@ -72,9 +72,9 @@ public class UsuarioController {
         response.setHeader("Authorization", "Bearer " + (String) session.getAttribute("token"));
         log.info("asas " + (String) session.getAttribute("token"));
 
-        if (jwtFilter.isadmin()) {
+        if (jwtUtil.getrol((String) session.getAttribute("token")).equals("ROLE_admin")) {
             return new ResponseEntity<>("{\"mensaje\": \"Eres un admin\"}", HttpStatus.OK);
-        } else if (jwtFilter.isUser()) {
+        } else if (jwtUtil.getrol((String) session.getAttribute("token")).equals("ROLE_user")) {
             return new ResponseEntity<>("{\"mensaje\": \"Eres un usuario\"}", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("{\"mensaje\": \"Rol no reconocido\"}", HttpStatus.BAD_REQUEST);

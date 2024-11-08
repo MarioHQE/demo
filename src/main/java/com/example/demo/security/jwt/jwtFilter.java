@@ -13,7 +13,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.example.demo.security.UsuarioDetailsService;
 
 import io.jsonwebtoken.Claims;
-import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,8 +32,8 @@ public class jwtFilter extends OncePerRequestFilter {
     Claims claims = null;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
         // Permitir acceso a rutas específicas y a cualquier archivo CSS
@@ -62,18 +61,6 @@ public class jwtFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
 
-    }
-
-    public Boolean isadmin() {
-        return "ROLE_admin".equalsIgnoreCase((String) claims.get("rol"));
-    }
-
-    public Boolean isUser() {
-        return "ROLE_user".equalsIgnoreCase((String) claims.get("rol"));
-    }
-
-    public String getCurrentUsername() {
-        return (String) claims.get("name");
     }
 
 }

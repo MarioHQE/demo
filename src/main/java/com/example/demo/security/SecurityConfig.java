@@ -46,6 +46,7 @@ public class SecurityConfig {
                         "/css/**", "/js/**", "/favicon.ico", "/uploads/**", "/reserva", "/reservas")
                 .permitAll().anyRequest().authenticated()
                 .and()
+                .formLogin((login) -> login.loginPage("/login_admin").defaultSuccessUrl("/index").permitAll())
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
