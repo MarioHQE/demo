@@ -29,7 +29,10 @@
                 <div class="collapse navbar-collapse" id="mynavbar">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="index">Villa Hermosa</a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index">VILLA HERMOSA</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="chef">CHEF</a>
@@ -41,18 +44,38 @@
                             <a class="nav-link" href="contacto">CONTACTO</a>
                         </li>
                         <li class="nav-item"></li>
-                        <span th:if="${nombre != null}" class='ms-1 nav-link espacio'>Bienvenido, [[${nombre}]]</span>
+                        <span th:if="${nombre != null and nombre != ''}" class="ms-1 nav-link espacio">Bienvenido,
+                            [[${nombre}]]</span>
+                        <span th:if="${nombre == null or nombre == ''}" class="ms-1 nav-link espacio">Bienvenido,
+                            Invitado</span>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#"><i class="bi bi-instagram"></i></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#"><i class="bi bi-tiktok"></i></a>
                         </li>
+
+                        <form class="d-flex" th:if="${nombre != null}">
+                            <a class="btn btn-outline-dark" href="http://localhost:3600/reserva">RESERVAR</a>
+                        </form>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-dark" th:unless="${nombre != null}"
+                                href="http://localhost:3600/login_admin">
+                                <span class="link_login">Iniciar Sesión</span>
+                            </a>
+
+                            <button th:if="${nombre != null }" id="logout-btn" class="btn btn-outline-dark"><span>
+                                    Cerrar Sesión</span></button>
+
+
+                        </li>
+
+
                     </ul>
-                    <form class="d-flex">
-                        <a class="btn btn-outline-dark" href="http://localhost:3600/reserva">RESERVAR</a>
-                    </form>
+
+
                 </div>
             </div>
         </nav>

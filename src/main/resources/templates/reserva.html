@@ -77,13 +77,11 @@
                     </div>
                     <div class="mb-3 mt-3">
                         <label for="lastname" class="form-label">Apellidos:</label>
-                        <input type="text" class="form-control" name="lastname" value="<?php echo isset($_SESSION["
-                            apellido"]) ? $_SESSION["apellido"] : "" ; ?>" required>
+                        <input type="text" class="form-control" name="lastname" value="" required>
                     </div>
                     <div class="mb-3 mt-3">
                         <label for="correo" class="form-label">Email:</label>
-                        <input type="email" class="form-control" name="correo" value="<?php echo isset($_SESSION["
-                            correo"]) ? $_SESSION["correo"] : "" ?>" required>
+                        <input type="email" class="form-control" name="correo" value="" required>
                     </div>
                     <div class="mb-3 mt-3">
                         <label for="numero" class="form-label">Número de teléfono:</label>
@@ -108,7 +106,7 @@
                     <div class="d-grid">
                         <button type="submit" name="reserva" class="btn btn-outline-white btn-block">Registrar
                             reserva</button>
-                        <?php include("php/reservarmesa.php"); ?>
+
                     </div>
                     <div class="d-grid mt-3">
                         <button type="button" class="btn btn-outline-dark btn-block"
@@ -175,8 +173,8 @@
                 type: 'POST',
                 url: 'http://localhost:3600/reserva/crear',
                 data: formData,
-                headers:{
-                    'Authorization': 'Bearer '+ token
+                headers: {
+                    'Authorization': 'Bearer ' + token
                 },
                 success: function (response) {
                     $('#message').html('<div class="alert alert-success">' + response + '</div>');

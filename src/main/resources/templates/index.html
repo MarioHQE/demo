@@ -18,6 +18,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/navstyle.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+
 
 </head>
 <style>
@@ -81,17 +84,34 @@
                             <a class="nav-link" href="contacto">CONTACTO</a>
                         </li>
                         <li class="nav-item"></li>
-                        <span th:if="${nombre != null}" class='ms-1 nav-link espacio'>Bienvenido, [[${nombre}]]</span>
+                        <span th:if="${nombre != null and nombre != ''}" class="ms-1 nav-link espacio">Bienvenido,
+                            [[${nombre}]]</span>
+                        <span th:if="${nombre == null or nombre == ''}" class="ms-1 nav-link espacio">Bienvenido,
+                            Invitado</span>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#"><i class="bi bi-instagram"></i></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#"><i class="bi bi-tiktok"></i></a>
                         </li>
-                        <form class="d-flex">
+
+                        <form class="d-flex" th:if="${nombre != null}">
                             <a class="btn btn-outline-dark" href="http://localhost:3600/reserva">RESERVAR</a>
                         </form>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-dark" th:unless="${nombre != null}"
+                                href="http://localhost:3600/login_admin">
+                                <span class="link_login">Iniciar Sesión</span>
+                            </a>
+
+                            <button th:if="${nombre != null }" id="logout-btn" class="btn btn-outline-dark"><span> Cerrar Sesión</span></button>
+
+
+                        </li>
+
+
                     </ul>
 
 
@@ -225,33 +245,11 @@
 
     </div>
     <script>
-
-        document.addEventListener("scroll", function () {
-            // Obtén la posición actual del scroll
-            var scrollPosition = window.scrollY;
-
-            // Determina cuándo quieres que aparezcan los elementos del primer conjunto
-            var triggerPosition1 = 300;
-
-            // Determina cuándo quieres que aparezcan los elementos del segundo conjunto
-            var triggerPosition2 = 600;
-
-
-            if (scrollPosition > triggerPosition1) {
-
-                document.getElementById("efecto2").classList.add('visible2');
-            }
-            if (scrollPosition > triggerPosition2) {
-
-                setTimeout(function () {
-                    document.getElementById("efecto1").classList.add('visible2');
-                }, 500);
-            }
-        });
-
-
-
+        var token = '[[${session.token}]]';
     </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script defer src="js/index.js"> </script>
+
 </body>
 
 

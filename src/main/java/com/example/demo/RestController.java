@@ -49,7 +49,8 @@ public class RestController {
 
     @GetMapping("/index")
     public String comienzo(Model modelo, HttpSession session, HttpServletResponse response) {
-
+        response.setHeader("Authorization", "Bearer " +
+                session.getAttribute("token"));
         String nombre = (String) session.getAttribute("username");
         modelo.addAttribute("nombre", nombre);
         System.out.println(session.getAttribute("token"));
@@ -80,6 +81,11 @@ public class RestController {
         response.addHeader("Authorization", "Bearer " +
                 session.getAttribute("token"));
         return "login";
+    }
+
+    @GetMapping("/carrito")
+    public String carrito() {
+        return "carrito";
     }
 
     @GetMapping("/regform")

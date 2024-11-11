@@ -40,15 +40,14 @@ public class SecurityConfig {
                 .csrf().disable().authorizeHttpRequests()
                 .requestMatchers("/index", "/img/**",
                         "/css/**", "/js/**", "/favicon.ico", "/empleado/login", "/prueba",
-                        "/login_admin", "/reform", "/chef", "/contacto", "/carta", "/empleado/registrar")
+                        "/login_admin", "/regform", "/chef", "/contacto", "/carta", "/empleado/registrar", "/carrito")
                 .permitAll()
                 .requestMatchers("/prueba", "menu_login", "/platos", "/hola", "/img/**",
                         "/css/**", "/js/**", "/favicon.ico", "/uploads/**", "/reserva", "/reservas")
                 .permitAll().anyRequest().authenticated()
                 .and()
-                .formLogin((login) -> login.loginPage("/login_admin").defaultSuccessUrl("/index").permitAll())
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
 
         httpsecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
