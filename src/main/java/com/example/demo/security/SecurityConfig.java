@@ -40,10 +40,12 @@ public class SecurityConfig {
                 .csrf().disable().authorizeHttpRequests()
                 .requestMatchers("/index", "/img/**",
                         "/css/**", "/js/**", "/favicon.ico", "/empleado/login", "/prueba",
-                        "/login_admin", "/regform", "/chef", "/contacto", "/carta", "/empleado/registrar", "/carrito")
+                        "/login_admin", "/regform", "/chef", "/contacto", "/carta", "/empleado/registrar", "/carrito",
+                        "/stripe/paymentinten", "/stripe/confirm/**", "/stripe/**", "/success", "/pedido/**")
                 .permitAll()
                 .requestMatchers("/prueba", "menu_login", "/platos", "/hola", "/img/**",
-                        "/css/**", "/js/**", "/favicon.ico", "/uploads/**", "/reserva", "/reservas")
+                        "/css/**", "/js/**", "/favicon.ico", "/uploads/**", "/reserva", "/reservas", "/platos",
+                        "/mesas")
                 .permitAll().anyRequest().authenticated()
                 .and()
                 .sessionManagement()

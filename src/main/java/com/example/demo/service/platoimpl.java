@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.dao.platorepository;
 import com.example.demo.entity.Plato;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.file.*;
 
@@ -39,23 +40,31 @@ public class platoimpl implements platoservice {
 
         // Validar que todos los campos están completos
         if (validate(nombre, descripcion, precio)) {
+
             if (!imagen.isEmpty()) {
-                Path directorioimagenes = Paths.get("src//main//resources//static/uploads");
-                String rutaabsoluta = directorioimagenes.toFile().getAbsolutePath();
-                try {
-                    byte[] bytesimg = imagen.getBytes();
-                    Path rutacompletoa = Paths.get(rutaabsoluta + "//" + imagen.getOriginalFilename());
-                    Files.write(rutacompletoa, bytesimg);
-                    plato.setFoto(imagen.getOriginalFilename());
+                String contentype = imagen.getContentType();
+                if (!Objects.equals(contentype, "image/jpeg") && !Objects.equals(contentype, "image/png")) {
+                    return new ResponseEntity<>("Formato de imagen no válido (JPG o PNG)", HttpStatus.BAD_REQUEST);
+                } else {
 
-                    // Guardar el plato en la base de datos
-                    platodao.save(plato);
+                    Path directorioimagenes = Paths.get("src//main//resources//static/uploads");
+                    String rutaabsoluta = directorioimagenes.toFile().getAbsolutePath();
+                    try {
 
-                    return new ResponseEntity<>("Se ha guardado correctamente el plato", HttpStatus.OK);
+                        byte[] bytesimg = imagen.getBytes();
+                        Path rutacompletoa = Paths.get(rutaabsoluta + "//" + imagen.getOriginalFilename());
+                        Files.write(rutacompletoa, bytesimg);
+                        plato.setFoto(imagen.getOriginalFilename());
 
-                } catch (IOException e) {
-                    log.error("Error al guardar la imagen: ", e);
-                    return new ResponseEntity<>("Error al guardar la imagen", HttpStatus.INTERNAL_SERVER_ERROR);
+                        // Guardar el plato en la base de datos
+                        platodao.save(plato);
+
+                        return new ResponseEntity<>("Se ha guardado correctamente el plato", HttpStatus.OK);
+
+                    } catch (IOException e) {
+                        log.error("Error al guardar la imagen: ", e);
+                        return new ResponseEntity<>("Error al guardar la imagen", HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
                 }
             } else {
                 return new ResponseEntity<>("No se ha seleccionado imagen", HttpStatus.BAD_REQUEST);
@@ -83,7 +92,8 @@ public class platoimpl implements platoservice {
 
     @Override
     public ResponseEntity<String> actualizar(String id, String nombre, String descripcion, String precio,
-            MultipartFile imagen) {
+            MultipartFile imagen, HttpSession sesion) {
+
         // Traer el plato existente por ID
         Plato platoexistente = platodao.findById(Integer.parseInt(id));
         log.info("plato existente");
@@ -99,23 +109,26 @@ public class platoimpl implements platoservice {
                 // Si se seleccionó una nueva imagen, actualizarla
 
                 if (!imagen.isEmpty()) {
-                    Path directorioimagenes = Paths.get("src//main//resources//static/uploads");
-                    String rutaabsoluta = directorioimagenes.toFile().getAbsolutePath();
-                    try {
-                        byte[] bytesimg = imagen.getBytes();
-                        Path rutacompletoa = Paths.get(rutaabsoluta + "//" + imagen.getOriginalFilename());
-                        Files.write(rutacompletoa, bytesimg);
-                        platoexistente.setFoto(imagen.getOriginalFilename());
-                        log.info("dentro de la imagen aa ver si funciona");
-                    } catch (IOException e) {
-                        log.error("Error al guardar la imagen: ", e);
-                        return new ResponseEntity<>("Error al guardar la imagen", HttpStatus.INTERNAL_SERVER_ERROR);
+                    String contentype = imagen.getContentType();
+                    if (!Objects.equals(contentype, "image/jpeg") && !Objects.equals(contentype, "image/png")) {
+                        return new ResponseEntity<>("Formato de imagen no válido (JPG o PNG)", HttpStatus.BAD_REQUEST);
+                    } else {
+                        Path directorioimagenes = Paths.get("src//main//resources//static/uploads");
+                        String rutaabsoluta = directorioimagenes.toFile().getAbsolutePath();
+                        try {
+                            byte[] bytesimg = imagen.getBytes();
+                            Path rutacompletoa = Paths.get(rutaabsoluta + "//" + imagen.getOriginalFilename());
+                            Files.write(rutacompletoa, bytesimg);
+                            platoexistente.setFoto(imagen.getOriginalFilename());
+                            log.info("dentro de la imagen aa ver si funciona");
+                            platodao.save(platoexistente);
+                            return new ResponseEntity<String>("Plato actualizado correctamente", HttpStatus.OK);
+                        } catch (IOException e) {
+                            log.error("Error al guardar la imagen: ", e);
+                            return new ResponseEntity<>("Error al guardar la imagen", HttpStatus.INTERNAL_SERVER_ERROR);
+                        }
                     }
                 }
-
-                // Guardar los cambios en la base de datos
-                platodao.save(platoexistente);
-                return new ResponseEntity<String>("Plato actualizado correctamente", HttpStatus.OK);
             }
             return new ResponseEntity<>("No se ha completado todos los campos", HttpStatus.BAD_REQUEST);
         } else {

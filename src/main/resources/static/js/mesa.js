@@ -1,12 +1,12 @@
 $(document).ready(function () {
-    $('#formGuardarPlato').on('submit', function (e) {
+    $('#formGuardarMesa').on('submit', function (e) {
         e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
         // Crear un FormData para manejar el archivo y los otros datos
         var formData = new FormData(this);
 
         $.ajax({
-            url: '/plato/guardar',
+            url: '/mesa/crear',
             type: 'POST',
             data: formData,
             headers: {
@@ -32,10 +32,10 @@ $(document).ready(function () {
         e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
         var formData = new FormData(this);
-        var idPlato = $('#id_plato').val(); // Obtener el ID del plato
+        var idMesa = $('#idMesa').val(); // Obtener el ID del plato
 
         $.ajax({
-            url: '/plato/actualizar',
+            url: '/mesa/actualizar',
             type: 'POST',
             data: formData,
             headers: {
@@ -46,7 +46,7 @@ $(document).ready(function () {
             success: function (response) {
                 alert('Plato actualizado exitosamente');
                 $('#formactu').modal('hide');
-                location.reload(); // Regar la página para mostrar los cambios
+                location.reload(); // Recargar la página para mostrar los cambios
             },
             error: function (response) {
                 // Mostrar el mensaje de error detallado
@@ -58,18 +58,18 @@ $(document).ready(function () {
 
     $(document).ready(function () {
         $('.eliminar').click(function () {
-            var idPlato = $(this).attr('data-id'); // Obtiene el ID del plato del atributo data-id
+            var idmesa = $(this).attr('data-id'); // Obtiene el ID del plato del atributo data-id
 
-            if (confirm('¿Estás seguro de que deseas eliminar este plato?')) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta mesa?')) {
                 $.ajax({
-                    url: '/plato/eliminar', // Ruta de eliminación en el controlador
+                    url: '/mesa/eliminar', // Ruta de eliminación en el controlador
                     type: 'DELETE', // Método HTTP DELETE
-                    data: { id_plato: idPlato }, // Datos que se envían al servidor
+                    data: { idmesa: idmesa }, // Datos que se envían al servidor
                     headers: {
                         "Authorization": 'Bearer ' + token // Token de autenticación si es necesario
                     },
                     success: function (response) {
-                        alert('Plato eliminado exitosamente');
+                        alert('Mesa eliminada exitosamente');
                         location.reload(); // Recargar la página para actualizar la lista de platos
                     },
                     error: function (response) {

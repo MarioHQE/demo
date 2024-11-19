@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.entity.Plato;
 
+import jakarta.servlet.http.HttpSession;
+
 @Service
 public interface platoservice {
 
@@ -16,7 +18,7 @@ public interface platoservice {
     public ResponseEntity<String> guardar(MultipartFile imagen, String nombre, String descripcion, String precio);
 
     public ResponseEntity<String> actualizar(String id, String nombre, String descripcion, String precio,
-            MultipartFile imagen);
+            MultipartFile imagen, HttpSession sesion);
 
     public ResponseEntity<String> eliminar(String id);
 }

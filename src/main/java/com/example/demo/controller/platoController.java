@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.demo.entity.Plato;
 import com.example.demo.service.platoimpl;
 
+import jakarta.servlet.http.HttpSession;
+
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +46,9 @@ public class platoController {
             @RequestParam("actuNombre") String nombre,
             @RequestParam("actuDescripcion") String descripcion,
             @RequestParam("actuprecio") String precio,
-            @RequestParam("actufoto") MultipartFile imagen) {
+            @RequestParam("actufoto") MultipartFile imagen, HttpSession sesion) {
 
-        return platodao.actualizar(id, nombre, descripcion, precio, imagen);
+        return platodao.actualizar(id, nombre, descripcion, precio, imagen, sesion);
     }
 
     @DeleteMapping("/eliminar")

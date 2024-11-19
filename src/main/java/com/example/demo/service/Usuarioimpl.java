@@ -81,7 +81,13 @@ public class Usuarioimpl implements UsuarioService {
     private Usuario traerusuario(Map<String, String> requesmap) {
         Rol rol = roldao.findByNombre(requesmap.get("rol"));
         if (rol == null) {
-            rol = roldao.findByNombre("ROLE_user");
+            rol = roldao.findByNombre("USER");
+            if (rol == null) {
+                Rol rolvacio = new Rol();
+                rolvacio.setNombre("USER");
+                rol = rolvacio;
+                roldao.save(rolvacio);
+            }
         }
         Usuario usuario = new Usuario();
 

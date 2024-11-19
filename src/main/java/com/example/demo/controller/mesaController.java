@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -59,4 +62,22 @@ public class mesaController {
         return responseHtml.toString();
     }
 
+    @PostMapping("/crear")
+    public ResponseEntity<String> crearmesa(@RequestParam("capacidad") int capidad,
+            @RequestParam("numero") int nroMesa) {
+
+        return mesadao.crearmesa(capidad, nroMesa);
+    }
+
+    @PostMapping("/actualizar")
+    public ResponseEntity<String> actualizar(@RequestParam("idmesa") int id,
+            @RequestParam("actucapacidad") int capacidad, @RequestParam("actunumero") int nro_mesa) {
+        return mesadao.actualizar(id, capacidad, nro_mesa);
+    }
+
+    @DeleteMapping("/eliminar")
+    public ResponseEntity<String> eliminar(@RequestParam("idmesa") String id) {
+        return mesadao.eliminar(id);
+
+    }
 }

@@ -45,7 +45,7 @@
                         class="link-text">USUARIOS</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#"><i class="bi bi-images"></i> <span class="link-text">IMAGENES G.</span></a>
+                <a class="nav-link" href="mesas"><i class="bi bi-images"></i> <span class="link-text">Mesas</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="php/logout.php"> <i class="bi bi-box-arrow-left"></i><span class="link-text">
@@ -63,14 +63,14 @@
         <div class="container mt-5 pt-4">
             <div class="row align-items-center mb-3">
                 <div class="col-sm-4">
-                    <h3>Lista de Platos</h3>
+                    <h3>Lista de Mesas</h3>
                 </div>
                 <div class="col-sm-4 d-flex justify-content-center">
                     <input class="form-control" id="myInput" type="text" placeholder="Filtrar">
                 </div>
                 <div class="col-sm-4 d-flex justify-content-end">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#formagre"><i
-                            class="bi bi-plus-circle"></i> Nuevo Plato</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mesaag"><i
+                            class="bi bi-plus-circle"></i> Agregar Mesa</button>
                 </div>
             </div>
 
@@ -81,30 +81,22 @@
                     <thead>
                         <tr>
                             <th>N°</th>
-                            <th>Nombre</th>
-                            <th>Imagen</th>
-                            <th>Descripcion</th>
-                            <th>Precio</th>
-                            <th>Opciones</th>
+                            <th>Capacidad</th>
+                            <th>Numero de Mesa</th>
                         </tr>
                     </thead>
                     <tbody id="myTable">
-                        <tr th:each="plato:${platos}" th:attr="data-id=${plato.Id_plato}">
-                            <th th:text="${plato.Id_plato}"></th>
-                            <th th:text="${plato.nombre}"></th>
-                            <th> <img class='card-img-top img-fluid img-custom' th:src="@{'uploads/' + ${plato.foto}}"
-                                    alt='Card image'></th>
-                            <th th:text="${plato.descripcion}"></th>
-                            <th th:text="${plato.precio}"></th>
+                        <tr th:each="mesa:${mesas}" th:attr="data-id=${mesa.idMesa}">
+                            <th th:text="${mesa.idMesa}"></th>
+                            <th th:text="${mesa.capacidadDeMesa}"></th>
+                            <th th:text="${mesa.nroMesa}"></th>
                             <th>
-                                <button type="button" class="btn btn-warning btn-edit" th:attr="data-id=${plato.Id_plato}, 
-             data-nombre=${plato.nombre}, 
-             data-precio=${plato.precio}, 
-             data-descripcion=${plato.descripcion}" data-bs-toggle="modal" data-bs-target="#formactu">
+                                <button type="button" class="btn btn-warning btn-edit" th:attr="data-id=${mesa.idMesa}, 
+             data-capacidad=${mesa.capacidadDeMesa}, 
+             data-nro=${mesa.nroMesa}" data-bs-toggle="modal" data-bs-target="#formactu">
                                     <i class="bi bi-pencil-square"></i> Editar
                                 </button>
-                                <button type="button" class="btn btn-danger eliminar "
-                                    th:attr="data-id=${plato.Id_plato}">
+                                <button type="button" class="btn btn-danger eliminar " th:attr="data-id=${mesa.idMesa}">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </button>
                             </th>
@@ -115,37 +107,23 @@
         </div>
     </div>
 
-
-
-
-    <div class="modal" id="formagre">
+    <div class="modal" id="mesaag">
         <div class="modal-dialog">
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h4 class="modal-title">Agregar Plato</h4>
+                    <h4 class="modal-title">Agregar Mesa</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="formGuardarPlato" method="post" enctype="multipart/form-data">
-
+                    <form id="formGuardarMesa" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
-                            <label class="form-label">Nombre</label>
-                            <input name="nombre" type="text" class="form-control" required>
+                            <label class="form-label" for="capacidad">Capacidad</label>
+                            <input type="number" name="capacidad" class="form-control" require>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Imagen</label>
-                            <input type="file" name="foto" class="form-control" require>
-                        </div>
-                        <label> Descripción</label>
-                        <div class="form-floating mb-3">
-                            <textarea class="form-control" name="descripcion" rows="3" require></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="Precio">Precio</label>
-                            <input type="number" name="precio" class="form-control" require>
-
-
+                            <label class="form-label" for="numero">Numero de mesa</label>
+                            <input type="number" name="numero" class="form-control" require>
                         </div>
                         <button name="registro" type="submit" class="btn btn-primary">Agregar</button>
                     </form>
@@ -156,6 +134,8 @@
         </div>
 
     </div>
+
+
     <div class="modal" id="formactu">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -167,24 +147,17 @@
                 <div class="modal-body">
                     <form id="updateForm" method="post" enctype="multipart/form-data">
 
-                        <input type="hidden" name="id_plato" id="id_plato">
+                        <input type="hidden" name="idmesa" id="idmesa">
                         <!-- Existing form fields -->
+
                         <div class="mb-3">
-                            <label class="form-label">Nombre</label>
-                            <input id="actuNombre" name="actuNombre" type="text" class="form-control">
+                            <label class="form-label">Capacidad</label>
+                            <input type="number" id="actucapacidad" name="actucapacidad" class="form-control">
                         </div>
+
                         <div class="mb-3">
-                            <label class="form-label">Imagen</label>
-                            <input type="file" id="actufoto" name="actufoto" class="form-control">
-                        </div>
-                        <label> Descripción</label>
-                        <div class="form-floating mb-3">
-                            <textarea id="actuDescripcion" class="form-control" name="actuDescripcion"
-                                placeholder="Leave a comment here"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Precio</label>
-                            <input type="number" id="actuprecio" name="actuprecio" class="form-control">
+                            <label class="form-label">Numero de mesa</label>
+                            <input type="number" id="actunumero" name="actunumero" class="form-control">
                         </div>
                         <button name="actualizar" type="submit" class="btn btn-primary">Actualizar</button>
 
@@ -215,8 +188,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="js/menu_login.js"></script>
-    <script src="js/actuplato.js"></script>
-    <script defer src="js/plato.js"></script>
+    <script src="js/mesa.js"> </script>
+    <script src="js/actumesa.js"></script>
+
 
 
 </body>
