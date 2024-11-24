@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -9,7 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.example.demo.dao.pedido_platorepository;
+import com.example.demo.dao.pedidorepository;
 import com.example.demo.dao.platorepository;
+import com.example.demo.entity.PedidoPlato;
 import com.example.demo.entity.Plato;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
@@ -22,7 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 public class platoimpl implements platoservice {
 
     @Autowired
-    platorepository platodao;
+    private platorepository platodao;
+    @Autowired
+    private pedido_platorepository pedidoplatodao;
+
+    @Autowired
+    private pedidorepository pedidoao;
 
     @Override
     public ArrayList<Plato> traerplatos() {
@@ -151,6 +161,7 @@ public class platoimpl implements platoservice {
             return new ResponseEntity<>("Plato no encontrado", HttpStatus.NOT_FOUND);
 
         }
+
         // Eliminar el plato de la base de datos
         Path directorioimagenes = Paths.get("src//main//resources//static/uploads");
         String rutaabsoluta = directorioimagenes.toFile().getAbsolutePath();
@@ -164,7 +175,10 @@ public class platoimpl implements platoservice {
                 log.info("Imagen eliminada correctamente");
             }
         }
-
+        List<PedidoPlato> pedidosplatos = pedidoplatodao.encontrarpedidosbyplatoid(platoexistente.getId_plato());
+        for (PedidoPlato pedidoPlato : pedidosplatos) {
+            pedidoplatodao.delete(pedidoPlato);
+        }
         platodao.delete(platoexistente);
 
         return new ResponseEntity<>("Se ha eliminado este plato", HttpStatus.OK);

@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
@@ -14,9 +15,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -24,30 +25,35 @@ import lombok.Data;
 @Data
 @DynamicInsert
 @DynamicUpdate
+@NamedQuery(name = "Pedido.findPedidobyCorreo", query = "SELECT DISTINCT p FROM Pedido p INNER JOIN p.id_usuario u INNER JOIN p.pedidoPlatos pp INNER JOIN pp.plato pl WHERE u.email = :correo ORDER BY p.id_pedido ")
 @Table(name = "Pedido")
 public class Pedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_pedido")
-    private int id_pedido;
+    public int id_pedido;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", foreignKey = @ForeignKey(name = "usuario_id"))
-    private Usuario id_usuario;
+    public Usuario id_usuario;
 
-    @ManyToMany
-    @JoinTable(name = "pedido_plato", joinColumns = @JoinColumn(name = "id_pedido"), inverseJoinColumns = @JoinColumn(name = "id_plato"), foreignKey = @ForeignKey(name = "pedido_id"), inverseForeignKey = @ForeignKey(name = "plato_id"))
-    private List<Plato> id_plato;
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
+    private List<PedidoPlato> pedidoPlatos;
+
     @Column(name = "fecha")
-    private LocalDateTime fecha;
+    public LocalDateTime fecha;
+
     @Column(name = "total")
-    private double total;
+    public double total;
+
     @Column(name = "estado")
-    private String estado;
+    public String estado;
 
     public void calcularTotal() {
-        this.total = id_plato.stream().mapToDouble(Plato::getPrecio).sum();
+        this.total = pedidoPlatos.stream()
+                .mapToDouble(pp -> pp.getPlato().getPrecio() * pp.getCantidad())
+                .sum();
     }
 
 }

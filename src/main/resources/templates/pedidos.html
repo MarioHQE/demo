@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .pedido {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .titulo {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Mis Pedidos</h1>
+
+        <div class="pedido" th:each="pedido : ${pedidos}">
+            <div class="titulo">Pedido [[${pedido.id_pedido}]]</div>
+            <p th:text="${pedido.fecha}"></p>
+            <p th:text="${pedido.estado}"></p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="plato : ${pedido.pedidoPlatos}">
+                        <td>
+                            <img th:src="@{|/uploads/${plato.plato.foto}|}" alt="Foto de Plato" class="img-thumbnail"
+                                style="width: 100px;">
+                        </td>
+                        <td th:text="${plato.plato.nombre}"></td>
+                        <td th:text="${plato.plato.descripcion}"></td>
+                        <td th:text="${plato.plato.precio}"></td>
+                        <td th:text="${plato.cantidad}"></td>
+                        <td>
+                            <button class="btn btn-danger btn-delete" data-bs-toggle="modal"
+                                data-bs-target="#eliminarPlatoModal" th:attr="data-plato-id=${plato.plato.id_plato},
+                                data-pedidoplato-id=${plato.idPedidoPlato}">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" style="text-align: right;">Total:</td>
+                        <td th:text="${pedido.total}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- <p>Total: <span th:text="${pedido.total}"></span></p> -->
+            <button class="btn btn-primary open-modal" data-bs-toggle="modal" data-bs-target="#platosModal"
+                th:attr="data-pedido-id=${pedido.id_pedido}">Agregar más platos</button>
+            <form id="checkoutForm">
+                <input type="hidden" name="email" th:value="${email}">
+                <input type="hidden" name="id_pedido" th:value="${pedido.id_pedido}">
+                <button type="button" class="btn btn-success" id="checkoutButton">Checkout</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="platosModal" tabindex="-1" aria-labelledby="platosModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="platosModalLabel">Lista de Platos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulario para enviar datos -->
+                    <form id="platosForm">
+                        <!-- Campo oculto para el ID del pedido -->
+                        <input type="hidden" id="pedidoId" name="pedidoId">
+
+                        <!-- Tabla de platos disponibles -->
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="plato : ${platos}">
+                                    <td>
+                                        <img th:src="@{|/uploads/${plato.foto}|}" alt="Foto de Plato"
+                                            class="img-thumbnail" style="width: 100px;">
+                                    </td>
+                                    <td th:text="${plato.nombre}"></td>
+                                    <td th:text="${plato.descripcion}"></td>
+                                    <td th:text="${plato.precio}"></td>
+                                    <td>
+                                        <input type="number" class="form-control cantidad-input" min="1" value="1">
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary agregar-plato" th:attr="
+                                    data-id=${plato.id_plato}, 
+                                    data-nombre=${plato.nombre},
+                                    data-precio=${plato.precio}">
+                                            Agregar
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Lista de platos seleccionados -->
+                        <h5>Platos Seleccionados</h5>
+                        <ul id="platosSeleccionados" class="list-group">
+                            <!-- Los platos seleccionados se renderizan aquí dinámicamente -->
+                        </ul>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success agregar-pedido">Agregar al Pedido</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="eliminarPlatoModal" tabindex="-1" aria-labelledby="eliminarPlatoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="deleteform" method="post">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="eliminarPlatoModalLabel">Eliminar Plato</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="platoId" name="platoId">
+                        <input type="hidden" id="pedidoPlatoId" name="pedidoPlatoId">
+
+                        ¿Está seguro de eliminar el plato seleccionado?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger eliminar-plato">Eliminar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap JS (Bundle includes Popper.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        const platosSeleccionados = [];
+
+        // Abre el modal y actualiza el ID del pedido
+        document.querySelectorAll(".open-modal").forEach(button => {
+            button.addEventListener("click", () => {
+                const pedidoId = button.getAttribute("data-pedido-id");
+                document.getElementById("pedidoId").value = pedidoId;
+            });
+        });
+
+        // Manejo del botón "Agregar" en cada plato
+        document.querySelectorAll(".agregar-plato").forEach(button => {
+            button.addEventListener("click", () => {
+                const id = button.getAttribute("data-id");
+                const nombre = button.getAttribute("data-nombre");
+                const precio = button.getAttribute("data-precio");
+                const cantidad = button.closest("tr").querySelector(".cantidad-input").value;
+
+                // Agregar plato a la lista de seleccionados
+                const platoExistente = platosSeleccionados.find(plato => plato.id === id);
+                if (platoExistente) {
+                    platoExistente.cantidad = parseInt(platoExistente.cantidad) + parseInt(cantidad);
+                } else {
+                    platosSeleccionados.push({ id, nombre, precio, cantidad });
+                }
+
+                renderizarPlatosSeleccionados();
+            });
+        });
+
+        // Renderizar la lista de platos seleccionados
+        function renderizarPlatosSeleccionados() {
+            const lista = document.getElementById("platosSeleccionados");
+            lista.innerHTML = "";
+
+            platosSeleccionados.forEach(plato => {
+                const item = document.createElement("li");
+                item.className = "list-group-item d-flex justify-content-between align-items-center";
+                item.innerHTML = `
+                    ${plato.nombre} (x${plato.cantidad}) - $${plato.precio}
+                    <button class="btn btn-danger btn-sm eliminar-plato" data-id="${plato.id}">Eliminar</button>
+                `;
+                lista.appendChild(item);
+            });
+
+            // Manejo del botón "Eliminar"
+            document.querySelectorAll(".eliminar-plato").forEach(button => {
+                button.addEventListener("click", () => {
+                    const id = button.getAttribute("data-id");
+                    const index = platosSeleccionados.findIndex(plato => plato.id === id);
+                    if (index !== -1) {
+                        platosSeleccionados.splice(index, 1);
+                    }
+                    renderizarPlatosSeleccionados();
+                });
+            });
+        }
+
+
+        // Manejo del botón "Agregar al Pedido"
+        document.querySelector(".agregar-pedido").addEventListener("click", () => {
+            const pedidoId = document.getElementById("pedidoId").value;
+
+            fetch(`/pedido/agregar-platos`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: Number(pedidoId),
+                    id_platos: platosSeleccionados.map(item => Number(item.id)),
+                    cantidades: platosSeleccionados.map(item => Number(item.cantidad))
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Platos agregados al pedido con éxito.");
+                        const modal = bootstrap.Modal.getInstance(document.getElementById("platosModal"));
+                        modal.hide();
+                    } else {
+                        alert("Error al agregar platos al pedido.");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        });
+        document.querySelectorAll(".btn-delete").forEach((btn) => {
+            btn.addEventListener("click", (evt) => {
+                evt.preventDefault();
+                const id = evt.target.getAttribute("data-plato-id");
+                const id2 = evt.target.getAttribute("data-pedidoplato-id");
+                const id_oculto = document.getElementById("platoId");
+                const id_oculto_2 = document.getElementById("pedidoPlatoId");
+                id_oculto_2.value = id2;
+                id_oculto.value = id;
+            })
+        })
+        $(document).on("click", ".eliminar-plato", function () {
+            const platoId = $("#platoId").val();
+            const pedidoPlatoId = $("#pedidoPlatoId").val();
+
+            $.ajax({
+                url: "http://localhost:3600/pedido/eliminar-plato",
+                type: "POST",
+                data: { id_plato: platoId, id_pedidoplato: pedidoPlatoId },
+                success: function (response) {
+                    alert(response); // Notificar éxito
+                    location.reload(); // Recargar la página para reflejar cambios
+                },
+                error: function (xhr) {
+                    alert("Error al eliminar el plato: " + xhr.responseText);
+                },
+            });
+        });
+
+        $(document).ready(function () {
+            $("#checkoutButton").on("click", function (e) {
+                e.preventDefault(); // Evita el comportamiento por defecto del botón
+
+                // Obtiene el valor del ID del pedido
+                var idPedido = $("input[name='id_pedido']").val();
+                var nombre = $("input[name='email']").val();
+
+
+                // Realiza la solicitud AJAX
+
+                $.ajax({
+                    url: "/pedido/create-checkout-session", // URL del servidor
+                    type: "POST", // Método de la solicitud
+                    contentType: "application/json", // Tipo de contenido
+                    data: JSON.stringify({
+                        id_pedido: Number(idPedido)
+                        , nombre: nombre
+                    }), // Datos enviados
+                    success: function (response) {
+                        // Verifica si se recibió una URL en la respuesta
+                        console.log(response);
+                        if (response.url) {
+                            window.location.href = response.url; // Redirige a la URL de checkout
+                        } else {
+                            alert("No se recibió una URL válida para el checkout.");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Manejo de errores
+                        console.error("Error en la solicitud AJAX:", error);
+                        alert("Hubo un problema al procesar tu solicitud.");
+                    }
+                });
+            });
+        });
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>

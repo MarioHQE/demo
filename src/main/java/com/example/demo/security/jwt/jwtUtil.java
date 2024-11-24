@@ -65,6 +65,11 @@ public class jwtUtil {
         return username;
     }
 
+    public String getemail(String token) {
+        String email = (String) extractAllClaims(token).get("sub");
+        return email;
+    }
+
     public String getrol(String token) {
         String rol = (String) extractAllClaims(token).get("rol");
         return rol;

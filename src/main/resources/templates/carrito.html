@@ -118,15 +118,17 @@
                 carrito.push({
                     id_plato:Number(row.cells[0].innerText),
                     nombre: row.cells[2].innerText,
-                    precio: row.cells[3].innerText
+                    precio: row.cells[3].innerText,
+                    cantidad: Number(row.cells[4].innerText)
                 });
                 console.log(carrito.map(item =>item.id_plato));
             });
 
             const datosPedido = {
-                correo: "empleado20@example.com", // Cambiar por el correo del usuario autenticado
+                correo: "marioelpro08@gmail.com", // Cambiar por el correo del usuario autenticado
                 id_platos: carrito.map(item => item.id_plato),
-                estado: "ESPERA"
+                estado: "ESPERA",
+                cantidades: carrito.map(item => item.cantidad)
             };
 
             const response = await fetch('/pedido/guardar', {

@@ -1,5 +1,9 @@
 package com.example.demo.service;
 
+import java.util.Map;
+
+import org.apache.catalina.connector.Response;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.stripe.pago;
@@ -13,5 +17,7 @@ public interface pagoservice {
     public PaymentIntent confirmtest(String id) throws StripeException;
 
     public PaymentIntent cancel(String id) throws StripeException;
+
+    public ResponseEntity<Map<String, String>> sesionpay(Map<String, Object> mapeo);
 
 }

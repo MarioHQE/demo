@@ -4,24 +4,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dao.pedidorepository;
+import com.example.demo.entity.Pedido;
 import com.example.demo.stripe.pago;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
-import com.stripe.model.PaymentMethod;
+import com.stripe.model.checkout.Session;
 import com.stripe.param.PaymentIntentCancelParams;
 import com.stripe.param.PaymentIntentConfirmParams;
-import com.stripe.param.PaymentIntentCreateParams;
 import com.stripe.param.PaymentIntentSearchParams;
+import com.stripe.param.checkout.SessionCreateParams;
 
 @Service
 public class pagoimpl implements pagoservice {
 
     @Value("${stripe.key.secret}")
     String secretkey;
+
+    @Autowired
+    pedidorepository pedidodao;
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
@@ -84,4 +91,50 @@ public class pagoimpl implements pagoservice {
         return PaymentIntent.search(params).getData().stream().filter(pi -> pi.getId().equals(id)).findFirst()
                 .orElse(null);
     }
+
+    @Override
+    public ResponseEntity<Map<String, String>> sesionpay(Map<String, Object> mapeo) {
+        try {
+            Stripe.apiKey = secretkey;
+
+            // Obtener el pedido por ID
+            int pedidoId = (int) mapeo.get("id_pedido");
+            Pedido pedido = pedidodao.findById(pedidoId).orElse(null);
+
+            if (pedido == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Pedido no encontrado"));
+            }
+
+            // Crear los parámetros para Stripe Checkout Session
+            SessionCreateParams params = SessionCreateParams.builder()
+                    .setMode(SessionCreateParams.Mode.PAYMENT).setCustomerEmail((String) mapeo.get("nombre"))
+                    .setSuccessUrl("http://localhost:3600/success") // URL de éxito
+                    .setCancelUrl("http://localhost:3600/cancel") // URL de cancelación
+                    .addLineItem(
+                            SessionCreateParams.LineItem.builder()
+                                    .setQuantity(1L) // Siempre será 1 para un pedido completo
+                                    .setPriceData(
+                                            SessionCreateParams.LineItem.PriceData.builder()
+                                                    .setCurrency("usd") // Cambia según tu configuración
+                                                    .setUnitAmount((long) (pedido.getTotal() * 100)) // Monto en
+                                                                                                     // centavos
+                                                    .setProductData(
+                                                            SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                                    .setName("Pedido #" + pedidoId)
+                                                                    .build())
+                                                    .build())
+                                    .build())
+                    .build();
+
+            // Crear la sesión de Stripe
+            Session session = Session.create(params);
+
+            // Retornar la URL de la sesión
+            return ResponseEntity.ok(Map.of("url", session.getUrl()));
+        } catch (StripeException e) {
+            // Manejar errores de Stripe
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
 }

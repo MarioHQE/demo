@@ -151,18 +151,18 @@ function realizarPago(e) {
           });
 }
 
-function confirmPayment(paymentIntentId) {
-     // Confirmar el pago en el backend
-     fetch(`http://localhost:3600/stripe/confirm/${paymentIntentId}`, {
-          method: 'POST',
-     })
-          .then(response => response.json())
-          .then(data => {
-               console.log('Pago confirmado:', data);
-               // Aquí puedes redirigir al usuario a una página de éxito
-               window.location.href = "/success"; // Redirigir a una página de éxito
-          })
-          .catch(error => {
-               console.error('Error al confirmar el pago:', error);
-          });
-}
+// function confirmPayment(paymentIntentId) {
+//      // Confirmar el pago en el backend
+//      fetch(`http://localhost:3600/stripe/confirm/${paymentIntentId}`, {
+//           method: 'POST',
+//      })
+//           .then(response => response.json())
+//           .then(data => {
+//                console.log('Pago confirmado:', data);
+//                // Aquí puedes redirigir al usuario a una página de éxito
+//                window.location.href = "/success"; // Redirigir a una página de éxito
+//           })
+//           .catch(error => {
+//                console.error('Error al confirmar el pago:', error);
+//           });
+// }

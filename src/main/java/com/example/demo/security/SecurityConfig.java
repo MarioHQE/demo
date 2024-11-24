@@ -41,7 +41,9 @@ public class SecurityConfig {
                 .requestMatchers("/index", "/img/**",
                         "/css/**", "/js/**", "/favicon.ico", "/empleado/login", "/prueba",
                         "/login_admin", "/regform", "/chef", "/contacto", "/carta", "/empleado/registrar", "/carrito",
-                        "/stripe/paymentinten", "/stripe/confirm/**", "/stripe/**", "/success", "/pedido/**")
+                        "/stripe/paymentinten", "/stripe/confirm/**", "/stripe/**", "/success", "/pedido/**",
+                        "/mispedidos/**", "/mispedidos", "/pedido/agregar-platos", "/create-checkout-session",
+                        "/pedido/create-checkout-session")
                 .permitAll()
                 .requestMatchers("/prueba", "menu_login", "/platos", "/hola", "/img/**",
                         "/css/**", "/js/**", "/favicon.ico", "/uploads/**", "/reserva", "/reservas", "/platos",

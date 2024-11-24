@@ -2,6 +2,7 @@ package com.example.demo;
 
 import com.example.demo.service.Usuarioimpl;
 import com.example.demo.service.mesaimpl;
+import com.example.demo.service.pedidoimpl;
 import com.example.demo.service.platoimpl;
 import com.example.demo.service.reservaimpl;
 import java.time.ZonedDateTime;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.example.demo.dao.RolRepository;
 import com.example.demo.entity.Mesa;
+import com.example.demo.entity.Pedido;
 import com.example.demo.entity.Plato;
 import com.example.demo.entity.Reserva;
 import com.example.demo.entity.Rol;
@@ -29,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -51,6 +54,9 @@ public class RestController {
     private reservaimpl reservadao;
     @Autowired
     private mesaimpl mesadao;
+
+    @Autowired
+    private pedidoimpl pedidodao;
 
     @GetMapping("/index")
     public String comienzo(Model modelo, HttpSession session, HttpServletResponse response) {
@@ -143,7 +149,7 @@ public class RestController {
         if (session.getAttribute("token") != null) {
             roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
             Rol rol = roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
-            if (rol.getNombre().equals("ROLE_user")) {
+            if (rol.getNombre().equals("USER")) {
                 log.info(jwtUtil.getrol((String) session.getAttribute("token")));
                 return "redirect:/index";
             }
@@ -230,6 +236,37 @@ public class RestController {
         jwtFilter.destroy();
 
         return new ResponseEntity<>("Sesión cerrada correctamente", HttpStatus.OK);
+    }
+
+    @GetMapping("/mispedidos")
+    public String pagos(Model modelo, HttpSession session) {
+        List<Plato> listaplato = platodao.traerplatos();
+        if (session.getAttribute("token") == null) {
+            return "redirect:/index";
+        } else if (session.getAttribute("token") != null) {
+            List<Pedido> pedido = pedidodao
+                    .traerPedidobycorreo(jwtUtil.getemail((String) session.getAttribute("token")));
+
+            for (Pedido pedido1 : pedido) {
+                pedido1.calcularTotal();
+            }
+            modelo.addAttribute("email", jwtUtil.getemail((String) session.getAttribute("token")));
+            modelo.addAttribute("pedidos", pedido);
+            modelo.addAttribute("platos", listaplato);
+        }
+
+        // for (Pedido pedido2 : pedido) {
+        // ArrayList<Plato> plato = (ArrayList<Plato>) pedido2.id_plato;
+        // }
+
+        // modelo.addAttribute("platos", plato);
+
+        return "pedidos";
+    }
+
+    @GetMapping("/checkout")
+    public String getMethodName() {
+        return "checkout";
     }
 
 }
