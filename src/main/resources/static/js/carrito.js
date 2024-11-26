@@ -1,3 +1,47 @@
+const token = document.querySelector('input[name="token"]').value;
+const correo = document.querySelector('input[name="correo"]').value;
+document.getElementById('pagar-carrito').addEventListener('click', async () => {
+     const carrito = []; // Obtén los datos del carrito desde tu tabla
+     document.querySelectorAll('#lista-carrito tbody tr').forEach(row => {
+          carrito.push({
+               id_plato: Number(row.cells[0].innerText),
+               nombre: row.cells[2].innerText,
+               precio: row.cells[3].innerText,
+               cantidad: Number(row.cells[4].innerText)
+          });
+          console.log(carrito.map(item => item.id_plato));
+     });
+     console.log(correo);
+     const datosPedido = {
+          correo: correo, // Cambiar por el correo del usuario autenticado
+          id_platos: carrito.map(item => item.id_plato),
+          estado: "ESPERA",
+          cantidades: carrito.map(item => item.cantidad)
+     };
+     if (token !== null && token !== "") {
+          const response = await fetch('/pedido/guardar', {
+               method: 'POST',
+               headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+               },
+               body: JSON.stringify(datosPedido)
+          });
+          const result = await response.text();
+
+          console.log(response);
+          alert(result);
+          if (response.status === 200) {
+               window.location.reload();
+          }
+     }
+     else {
+          alert('No has iniciado sesión');
+          window.location.href = '/login_admin';
+     }
+
+
+});
 // Variables
 const carrito = document.querySelector('#carrito');
 const listaplato = document.querySelector('#lista-cursos');
@@ -116,53 +160,3 @@ function vaciarCarrito() {
           contenedorCarrito.removeChild(contenedorCarrito.firstChild);
      }
 }
-// Escuchar el evento de pago
-document.querySelector('#pagar-carrito').addEventListener('click', realizarPago);
-
-function realizarPago(e) {
-     e.preventDefault();
-
-     // Calcular el monto total del carrito
-     const total = articulosCarrito.reduce((total, plato) => total + parseFloat(plato.precio.replace('USD', '').trim()) * plato.cantidad, 0);
-
-     // Crear un objeto para enviar al backend
-     const datosPago = {
-          description: "Compra de platillos",
-          amount: total * 100, // Stripe trabaja con centavos
-          currency: 'USD',
-     };
-
-     // Realizar una solicitud al backend para crear un PaymentIntent
-     fetch('http://localhost:3600/stripe/paymentinten', {
-          method: 'POST',
-          headers: {
-               'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(datosPago),
-     })
-          .then(response => response.json())
-          .then(data => {
-               // Aquí puedes redirigir al usuario al proceso de pago de Stripe
-               const paymentIntentId = data.id; // Asumimos que el backend devuelve el ID del PaymentIntent
-               confirmPayment(paymentIntentId);
-          })
-          .catch(error => {
-               console.error('Error al realizar el pago:', error);
-          });
-}
-
-// function confirmPayment(paymentIntentId) {
-//      // Confirmar el pago en el backend
-//      fetch(`http://localhost:3600/stripe/confirm/${paymentIntentId}`, {
-//           method: 'POST',
-//      })
-//           .then(response => response.json())
-//           .then(data => {
-//                console.log('Pago confirmado:', data);
-//                // Aquí puedes redirigir al usuario a una página de éxito
-//                window.location.href = "/success"; // Redirigir a una página de éxito
-//           })
-//           .catch(error => {
-//                console.error('Error al confirmar el pago:', error);
-//           });
-// }

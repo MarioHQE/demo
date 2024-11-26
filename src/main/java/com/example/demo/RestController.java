@@ -97,9 +97,13 @@ public class RestController {
     @GetMapping("/carrito")
     public String carrito(Model modelo, HttpServletRequest request, HttpServletResponse response,
             HttpSession session) {
+        String email = "";
         response.setHeader("Authorization", "Bearer " +
                 session.getAttribute("token"));
-
+        if (session.getAttribute("token") != null) {
+            email = jwtUtil.getemail((String) session.getAttribute("token"));
+        }
+        modelo.addAttribute("email", email);
         List<Plato> platos = platodao.traerplatos();
         modelo.addAttribute("platos", platos);
         return "carrito";
@@ -207,16 +211,17 @@ public class RestController {
     public String reservas(Model modelo, HttpServletResponse response, HttpSession session) {
         response.setHeader("Authorization", "Bearer " +
                 session.getAttribute("token"));
-        roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
-        Rol rol = roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
 
         if (session.getAttribute("token") != null) {
+            roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
+            Rol rol = roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
             if (rol.getNombre().equals("USER")) {
                 return "redirect:/index";
             }
         } else {
             return "redirect:/index";
         }
+
         List<Reserva> listareserva = reservadao.traerreserva();
         List<Reserva> listareservatendida = reservadao.atendido();
         ZonedDateTime fechaactual = ZonedDateTime.now(ZoneId.of("America/Lima"));

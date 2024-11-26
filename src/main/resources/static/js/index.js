@@ -25,7 +25,7 @@ document.addEventListener("scroll", function () {
 $('#logout-btn').on('click', function () {
     $.ajax({
         type: "POST",
-        url: "http://localhost:3600/cerrar",
+        url: "http://locahost:3600/cerrar",
         headers: {
             'Authorization': 'Bearer ' + token
         },

@@ -77,7 +77,8 @@
             <form id="checkoutForm">
                 <input type="hidden" name="email" th:value="${email}">
                 <input type="hidden" name="id_pedido" th:value="${pedido.id_pedido}">
-                <button type="button" class="btn btn-success" id="checkoutButton">Checkout</button>
+                <button type="button" class="btn btn-success btn-checkout"
+                    th:attr="data-pedido-id=${pedido.id_pedido}">Checkout</button>
             </form>
         </div>
     </div>
@@ -177,6 +178,8 @@
     <!-- Bootstrap JS (Bundle includes Popper.js) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js?v=1"></script>
+
     <script>
         const platosSeleccionados = [];
 
@@ -274,6 +277,7 @@
                 id_oculto.value = id;
             })
         })
+
         $(document).on("click", ".eliminar-plato", function () {
             const platoId = $("#platoId").val();
             const pedidoPlatoId = $("#pedidoPlatoId").val();
@@ -291,25 +295,23 @@
                 },
             });
         });
-
         $(document).ready(function () {
-            $("#checkoutButton").on("click", function (e) {
+            // Agregar evento a todos los botones con la clase 'btn-checkout'
+            $(".btn-checkout").on("click", function (e) {
                 e.preventDefault(); // Evita el comportamiento por defecto del botón
 
-                // Obtiene el valor del ID del pedido
-                var idPedido = $("input[name='id_pedido']").val();
-                var nombre = $("input[name='email']").val();
-
+                // Obtiene el ID del pedido desde el atributo data-pedido-id
+                const idPedido = $(this).data("pedido-id");
+                const email = $("input[name='email']").val(); // Obtén el email desde el formulario oculto
 
                 // Realiza la solicitud AJAX
-
                 $.ajax({
                     url: "/pedido/create-checkout-session", // URL del servidor
                     type: "POST", // Método de la solicitud
                     contentType: "application/json", // Tipo de contenido
                     data: JSON.stringify({
-                        id_pedido: Number(idPedido)
-                        , nombre: nombre
+                        id_pedido: idPedido,
+                        nombre: email
                     }), // Datos enviados
                     success: function (response) {
                         // Verifica si se recibió una URL en la respuesta
