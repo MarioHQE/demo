@@ -21,6 +21,12 @@ import java.io.IOException;
 import java.nio.file.*;
 
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 @Slf4j
@@ -34,6 +40,9 @@ public class platoimpl implements platoservice {
     @Autowired
     private pedidorepository pedidoao;
 
+    @Autowired
+    private S3Client s3client;
+
     @Override
     public ArrayList<Plato> traerplatos() {
         ArrayList<Plato> listaplato = (ArrayList<Plato>) platodao.findAll();
@@ -41,7 +50,8 @@ public class platoimpl implements platoservice {
     }
 
     @Override
-    public ResponseEntity<String> guardar(MultipartFile imagen, String nombre, String descripcion, String precio) {
+    public ResponseEntity<String> guardar(MultipartFile imagen, String nombre, String descripcion, String precio)
+            throws S3Exception, AwsServiceException, SdkClientException, IOException {
         // Crear un objeto Plato
         Plato plato = new Plato();
         plato.setNombre(nombre);
@@ -67,6 +77,10 @@ public class platoimpl implements platoservice {
                         plato.setFoto(imagen.getOriginalFilename());
 
                         // Guardar el plato en la base de datos
+
+                        PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket("restaurantevillahermosa")
+                                .key(imagen.getOriginalFilename()).build();
+                        s3client.putObject((putObjectRequest), RequestBody.fromBytes(imagen.getBytes()));
                         platodao.save(plato);
 
                         return new ResponseEntity<>("Se ha guardado correctamente el plato", HttpStatus.OK);
