@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dao.pedidorepository;
 import com.example.demo.entity.Pedido;
+import com.example.demo.entity.PedidoPlato;
+import com.example.demo.entity.Plato;
 import com.example.demo.stripe.pago;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
@@ -20,6 +23,7 @@ import com.stripe.param.PaymentIntentCancelParams;
 import com.stripe.param.PaymentIntentConfirmParams;
 import com.stripe.param.PaymentIntentSearchParams;
 import com.stripe.param.checkout.SessionCreateParams;
+import com.stripe.param.checkout.SessionCreateParams.LineItem;
 
 @Service
 public class pagoimpl implements pagoservice {
@@ -92,6 +96,7 @@ public class pagoimpl implements pagoservice {
                 .orElse(null);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ResponseEntity<Map<String, String>> sesionpay(Map<String, Object> mapeo) {
         try {
@@ -104,34 +109,40 @@ public class pagoimpl implements pagoservice {
             if (pedido == null) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Pedido no encontrado"));
             }
+            List<LineItem> lineitem = new ArrayList<>();
+            for (PedidoPlato pedidoplato : pedido.getPedidoPlatos()) {
+                LineItem lineitemperone = LineItem.builder()
+                        .setQuantity((long) pedidoplato.getCantidad()) // Cantidad de platos
+                        .setPriceData(
+                                LineItem.PriceData.builder()
+                                        .setCurrency("usd")
+                                        .setUnitAmount((long) (pedidoplato.getPlato().getPrecio() * 100))
+                                        .setProductData(
+                                                LineItem.PriceData.ProductData.builder()
+                                                        .setName(pedidoplato.getPlato().getNombre())
+                                                        .build())
+                                        .build())
+                        .build();
+                lineitem.add(lineitemperone);
 
+            }
             // Crear los parámetros para Stripe Checkout Session
+            int urlsucces = pedido.getId_pedido();
             SessionCreateParams params = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT).setCustomerEmail((String) mapeo.get("nombre"))
-                    .setSuccessUrl("http://localhost:3600/success") // URL de éxito
+                    .setPaymentIntentData(SessionCreateParams.PaymentIntentData.builder().putMetadata("pedido_id",
+                            String.valueOf(urlsucces)).build())
+                    .setSuccessUrl("http://localhost:3600/pedido/pagado/" + urlsucces)
                     .setCancelUrl("http://localhost:3600/cancel") // URL de cancelación
-                    .addLineItem(
-                            SessionCreateParams.LineItem.builder()
-                                    .setQuantity(1L) // Siempre será 1 para un pedido completo
-                                    .setPriceData(
-                                            SessionCreateParams.LineItem.PriceData.builder()
-                                                    .setCurrency("usd") // Cambia según tu configuración
-                                                    .setUnitAmount((long) (pedido.getTotal() * 100)) // Monto en
-                                                                                                     // centavos
-                                                    .setProductData(
-                                                            SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                    .setName("Pedido #" + pedidoId)
-                                                                    .build())
-                                                    .build())
-                                    .build())
+                    .addAllLineItem((List<LineItem>) lineitem)
                     .build();
 
-            // Crear la sesión de Stripe
             Session session = Session.create(params);
 
-            // Retornar la URL de la sesión
             return ResponseEntity.ok(Map.of("url", session.getUrl()));
-        } catch (StripeException e) {
+        } catch (
+
+        StripeException e) {
             // Manejar errores de Stripe
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }

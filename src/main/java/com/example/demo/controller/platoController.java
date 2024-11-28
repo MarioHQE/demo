@@ -9,7 +9,11 @@ import com.example.demo.entity.Plato;
 import com.example.demo.service.platoimpl;
 
 import jakarta.servlet.http.HttpSession;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +39,8 @@ public class platoController {
     public ResponseEntity<String> guardar(@RequestParam("foto") MultipartFile imagen,
             @RequestParam("nombre") String nombre,
             @RequestParam("descripcion") String descripcion,
-            @RequestParam("precio") String precio) {
+            @RequestParam("precio") String precio)
+            throws S3Exception, AwsServiceException, SdkClientException, IOException {
 
         return platodao.guardar(imagen, nombre, descripcion, precio);
     }

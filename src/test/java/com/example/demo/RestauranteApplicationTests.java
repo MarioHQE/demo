@@ -18,6 +18,10 @@ import com.example.demo.dao.platorepository;
 import com.example.demo.entity.Plato;
 import com.example.demo.service.platoimpl;
 
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+
 @SpringBootTest
 class RestauranteApplicationTests {
 
@@ -52,7 +56,7 @@ class RestauranteApplicationTests {
 	}
 
 	@Test
-	void testGuardarSinImagen() {
+	void testGuardarSinImagen() throws S3Exception, AwsServiceException, SdkClientException, IOException {
 		// Simular un archivo vacío
 		MockMultipartFile imagen = new MockMultipartFile(
 				"imagen",
