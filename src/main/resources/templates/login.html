@@ -67,7 +67,7 @@
             $('#loginForm').on('submit', function (event) {
                 event.preventDefault(); // Previene el comportamiento por defecto del formulario
                 $.ajax({
-                    url: 'http://localhost:3600/empleado/login',
+                    url: 'http://52.91.172.181/empleado/login',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify({

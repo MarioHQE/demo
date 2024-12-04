@@ -5,10 +5,16 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.dao.UsuarioRepository;
+import com.example.demo.entity.Usuario;
 import com.example.demo.security.jwt.jwtUtil;
 import com.example.demo.service.Usuarioimpl;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +30,9 @@ public class UsuarioController {
     private jwtUtil jwtUtil;
     @Autowired
     private Usuarioimpl usuarioimpl;
+
+    @Autowired
+    private UsuarioRepository usuariodao;
 
     @PostMapping("/registrar")
     public ResponseEntity<String> registrarusuario(@RequestBody Map<String, String> requesmap) {
@@ -46,6 +55,23 @@ public class UsuarioController {
         }
     }
 
+    @PostMapping("/verificar")
+    public ResponseEntity<String> verificarCodigo(@RequestBody Map<String, String> requestBody) {
+        String email = requestBody.get("email");
+        String codigo = requestBody.get("code");
+
+        Usuario usuario = usuariodao.findByCorreo(email);
+        if (usuario != null && usuario.getVerificationCode().equals(codigo)) {
+            if (usuario.getStatus().equals("false")) {
+                usuario.setStatus("true");
+                usuariodao.save(usuario);
+                return new ResponseEntity<>("Email verificado con éxito", HttpStatus.OK);
+            }
+            return new ResponseEntity<>("El email ya ha sido verificado", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Código inválido o usuario no encontrado", HttpStatus.BAD_REQUEST);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Map<String, String> requesmap, HttpSession sesion,
             HttpServletResponse response) {
@@ -63,10 +89,8 @@ public class UsuarioController {
     @PostMapping("/verificarRol")
     public ResponseEntity<String> verificarRol(HttpSession session, HttpServletResponse response) {
         // Añadir el token al encabezado de la respuesta
-        System.out.println("verificar: " + session.getAttribute("token"));
 
         response.setHeader("Authorization", "Bearer " + (String) session.getAttribute("token"));
-        log.info("asas " + (String) session.getAttribute("token"));
 
         if (jwtUtil.getrol((String) session.getAttribute("token")).equals("ROLE_admin")) {
             return new ResponseEntity<>("{\"mensaje\": \"Eres un admin\"}", HttpStatus.OK);
@@ -75,6 +99,17 @@ public class UsuarioController {
         } else {
             return new ResponseEntity<>("{\"mensaje\": \"Rol no reconocido\"}", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/actualizar")
+    public ResponseEntity<String> Actualizar(@RequestBody Map<String, String> requesMap) {
+
+        return usuarioimpl.actualizar(requesMap);
+    }
+
+    @DeleteMapping("/eliminar/{idUsuario}")
+    public ResponseEntity<String> eliminarUsuario(@PathVariable("idUsuario") int idUsuario) {
+        return usuarioimpl.eliminarUsuario(idUsuario);
     }
 
 }

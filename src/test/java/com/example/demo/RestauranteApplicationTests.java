@@ -20,6 +20,7 @@ import com.example.demo.service.platoimpl;
 
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @SpringBootTest
@@ -30,13 +31,15 @@ class RestauranteApplicationTests {
 
 	@Mock
 	private platorepository platorepo;
+	@Mock
+	private S3Client s3client;
 
 	@Test
 	void contextLoads() {
 	}
 
 	@Test
-	void testGuardarConImagenValida() throws IOException {
+	void testGuardarConImagenValida() throws S3Exception, AwsServiceException, SdkClientException, IOException {
 		MockMultipartFile imagen = new MockMultipartFile(
 				"imagen",
 				"cevichediana.jpg",

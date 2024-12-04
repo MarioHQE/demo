@@ -18,6 +18,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Null;
 import lombok.Data;
 
 @Entity
@@ -25,6 +26,9 @@ import lombok.Data;
 @DynamicInsert
 @DynamicUpdate
 @NamedQuery(name = "Pedido.findPedidobyCorreo", query = "SELECT DISTINCT p FROM Pedido p INNER JOIN p.id_usuario u INNER JOIN p.pedidoPlatos pp INNER JOIN pp.plato pl WHERE u.email = :correo ORDER BY p.id_pedido ")
+@NamedQuery(name = "Pedido.ObtenerPedidosatendidos", query = "SELECT DISTINCT p FROM Pedido p Where p.estado='atendido' ")
+@NamedQuery(name = "Pedido.ObtenerPedidosespera", query = "SELECT DISTINCT p FROM Pedido p Where p.estado='PAGADO' OR p.estado='ESPERA' ")
+
 @Table(name = "Pedido")
 public class Pedido {
 
@@ -48,6 +52,9 @@ public class Pedido {
 
     @Column(name = "estado")
     public String estado;
+
+    @Column(name = "id_pago", nullable = true)
+    public String id_pago;
 
     public void calcularTotal() {
         this.total = pedidoPlatos.stream()

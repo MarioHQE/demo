@@ -31,6 +31,7 @@ public class jwtFilter extends OncePerRequestFilter {
 
     Claims claims = null;
 
+    @SuppressWarnings("null")
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain)

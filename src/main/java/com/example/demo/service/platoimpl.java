@@ -31,15 +31,10 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @Service
 @Slf4j
 public class platoimpl implements platoservice {
-
     @Autowired
     private platorepository platodao;
     @Autowired
     private pedido_platorepository pedidoplatodao;
-
-    @Autowired
-    private pedidorepository pedidoao;
-
     @Autowired
     private S3Client s3client;
 

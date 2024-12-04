@@ -57,7 +57,7 @@
 
 <body>
     <div class="atras">
-        <a href="#"><i class="bi bi-arrow-left"></i>Volver al menú principal</a>
+        <a href="/index"><i class="bi bi-arrow-left"></i>Volver al menú principal</a>
     </div>
     <div class="container my-5">
         <h1 class="text-center mb-4">SUS DATOS DE RESERVA</h1>
@@ -66,39 +66,27 @@
                 <thead class="table-dark">
                     <tr>
                         <th>Nombre</th>
-                        <th>Apellido</th>
                         <th>Correo</th>
                         <th>Número</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
                         <th>Estado</th>
                         <th>Acciones</th>
-                        <th>Editar Hora</th>
                     </tr>
                 </thead>
-                <tbody class="table table-striped">
+                <tbody class="table table-striped" th:each=" reserva: ${reservas}">
                     <tr>
-                        <td>Juan</td>
-                        <td>Pérez</td>
-                        <td>juan.perez@gmail.com</td>
-                        <td>947483736</td>
-                        <td>Pendiente</td>
+                        <td th:text="${reserva.usuario.nombre}"></td>
+                        <td th:text="${reserva.usuario.email}"></td>
+                        <td th:text="${reserva.usuario.telefono}"></td>
+                        <td th:text="${reserva.fecha}"></td>
+                        <td th:text="${reserva.hora}"></td>
+                        <td th:text="${reserva.estado}"></td>
+
+
                         <td>
-                            <button class="btn btn-danger btn-sm">Eliminar</button>
-                        </td>
-                        <td>
-                            <button class="btn btn-primary btn-sm">Editar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Ana</td>
-                        <td>López</td>
-                        <td>ana.lopez@gmail.com</td>
-                        <td>940473636</td>
-                        <td>Pendiente</td>
-                        <td>
-                            <button class="btn btn-danger btn-sm">Eliminar</button>
-                        </td>
-                        <td>
-                            <button class="btn btn-primary btn-sm">Editar</button>
+                            <button class="btn btn-danger btn-sm delete-btn"
+                                th:attr="data-id=${reserva.idReserva}">Cancelar Reserva</button>
                         </td>
                     </tr>
                 </tbody>
@@ -108,8 +96,50 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+        </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js?v=1"></script>
+
+    <script>
+        var token = '[[${session.token}]]';  // Token de la sesión para autorización
+
+        // Esperar a que el documento esté cargado
+        document.addEventListener("DOMContentLoaded", function () {
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const idReserva = button.getAttribute('data-id');
+                    console.log(idReserva);
+
+                    const confirmar = confirm("¿Estás seguro de que quieres eliminar esta reserva?");
+                    if (!confirmar) return;
+
+                    // Usar AJAX para la solicitud de eliminación
+                    $.ajax({
+                        url: 'http://52.91.172.181/reserva/eliminar',
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            id_reserva: parseInt(idReserva, 10)
+                        }),
+                        success: function (data) {
+                           alert(data);
+                           location.reload();
+                        },
+                        error: function (xhr, status, error) {
+                           alert(error);
+                        }
+                    });
+                });
+            });
+        });
+
+    </script>
 </body>
 
 </html>

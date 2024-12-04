@@ -29,7 +29,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 @DynamicUpdate
 @Table(name = "Usuario")
 public class Usuario implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_usuario") // Make sure this matches the column name in your database
@@ -53,6 +52,9 @@ public class Usuario implements UserDetails {
 
     @Column(name = "status")
     private String status;
+
+    @Column(name = "verification_code")
+    private String verificationCode;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

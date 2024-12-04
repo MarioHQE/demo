@@ -17,66 +17,74 @@
 </head>
 
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <img src="img/logoVillaHermosa.jpeg" alt="logo" class="img_logo">
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-                    <span class="navbar-toggler-icon" style="color: #ffffff;"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mynavbar">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
+    <nav class="navbar navbar-expand-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="img/logoVillaHermosa.jpeg" alt="logo" class="img_logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mynavbar">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
 
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="index">VILLA HERMOSA</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="chef">CHEF</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="carta">CARTA</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="contacto">CONTACTO</a>
-                        </li>
-                        <li class="nav-item"></li>
-                        <span th:if="${nombre != null and nombre != ''}" class="ms-1 nav-link espacio">Bienvenido,
-                            [[${nombre}]]</span>
-                        <span th:if="${nombre == null or nombre == ''}" class="ms-1 nav-link espacio">Bienvenido,
-                            Invitado</span>
-                        </li>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index">VILLA HERMOSA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="chef">CHEF</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="carta">CARTA</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contacto">CONTACTO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:if="${nombre != null }" href="misreservas">Mis Reservas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:if="${nombre != null }" href="mispedidos">Mis Pedidos</a>
+                    </li>
+                    <li class="nav-item"></li>
+                    <span th:if="${nombre != null and nombre != ''}" class="ms-1 nav-link espacio">Bienvenido,
+                        [[${nombre}]]</span>
+                    <span th:if="${nombre == null or nombre == ''}" class="ms-1 nav-link espacio">Bienvenido,
+                        Invitado</span>
+                    </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="#"><i class="bi bi-instagram"></i></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#"><i class="bi bi-tiktok"></i></a>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-instagram"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-tiktok"></i></a>
+                    </li>
 
-                        <form class="d-flex" th:if="${nombre != null}">
-                            <a class="btn btn-outline-dark" href="/reserva">RESERVAR</a>
-                        </form>
-                        <li class="nav-item">
-                            <a class="btn btn-outline-dark" th:unless="${nombre != null}"
-                                href="/login_admin">
-                                <span class="link_login">Iniciar Sesión</span>
-                            </a>
+                    <form class="d-flex" th:if="${nombre != null}">
+                        <a class="btn btn-outline-dark" href="/reserva">RESERVAR</a>
+                    </form>
+                    <l1 class="nav-item">
+                        <a class="btn btn-outline-dark" th:if="${nombre != null }" href="/carrito">
+                            <span class="link_login">Carrito</span>
+                        </a>
+                    </l1>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-dark" th:unless="${nombre != null}" href="/login_admin">
+                            <span class="link_login">Iniciar Sesión</span>
+                        </a>
 
-                            <button th:if="${nombre != null }" id="logout-btn" class="btn btn-outline-dark"><span>
-                                    Cerrar Sesión</span></button>
-
-
-                        </li>
-                    </ul>
-
-
-                </div>
+                        <button th:if="${nombre != null }" id="logout-btn" class="btn btn-outline-dark"><span>
+                                Cerrar Sesión</span></button>
+                        <a class="btn btn-outline-dark" th:unless="${nombre != null}" href="/regform">
+                            <span class="link_login">Registrarse</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
-        </nav>
+        </div>
+    </nav>
     </header>
 
     <section>

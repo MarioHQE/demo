@@ -7,7 +7,7 @@ import com.example.demo.service.platoimpl;
 import com.example.demo.service.reservaimpl;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-
+import java.time.LocalDate;
 import java.time.ZoneId;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,6 +15,9 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
 import com.example.demo.dao.RolRepository;
+import com.example.demo.dao.UsuarioRepository;
+import com.example.demo.dao.pedidorepository;
+import com.example.demo.dao.reservarepository;
 import com.example.demo.entity.Mesa;
 import com.example.demo.entity.Pedido;
 import com.example.demo.entity.Plato;
@@ -31,7 +34,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @Slf4j
@@ -41,7 +46,10 @@ public class RestController {
     private RolRepository roldao;
     @Autowired
     private Usuarioimpl usuarioimpl;
-
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private pedidorepository pedidorepository;
     @Autowired
     public jwtFilter jwtFilter;
     @Autowired
@@ -50,6 +58,8 @@ public class RestController {
     private platoimpl platodao;
     @Autowired
     private reservaimpl reservadao;
+    @Autowired
+    private reservarepository reservarepository;
     @Autowired
     private mesaimpl mesadao;
 
@@ -62,9 +72,6 @@ public class RestController {
                 session.getAttribute("token"));
         String nombre = (String) session.getAttribute("username");
         modelo.addAttribute("nombre", nombre);
-        System.out.println(session.getAttribute("token"));
-        System.out.println(session.getAttribute("rol"));
-
         return "index";
     }
 
@@ -73,7 +80,6 @@ public class RestController {
         response.setHeader("Authorization", "Bearer " +
                 session.getAttribute("token"));
 
-        System.out.println("hsajjas " + session.getAttribute("token"));
         List<Usuario> traerusuarios = usuarioimpl.traerusuarios();
         modelo.addAttribute("empleados", traerusuarios);
 
@@ -137,26 +143,19 @@ public class RestController {
 
     @GetMapping("/menu_login")
     public String menu(Model modelo, HttpServletResponse response, HttpSession session) {
-        response.setHeader("Authorization", "Bearer " +
-                session.getAttribute("token"));
+        String redirect = soloadmins(modelo, response, session);
+        if (redirect != null) {
+            return redirect;
+        }
         return "menu_login";
     }
 
     @GetMapping("/platos")
     public String platos(Model modelo, HttpServletResponse response, HttpSession session) {
 
-        response.setHeader("Authorization", "Bearer " +
-                session.getAttribute("token"));
-
-        if (session.getAttribute("token") != null) {
-            roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
-            Rol rol = roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
-            if (rol.getNombre().equals("USER")) {
-                log.info(jwtUtil.getrol((String) session.getAttribute("token")));
-                return "redirect:/index";
-            }
-        } else {
-            return "redirect:/index";
+        String redirect = soloadmins(modelo, response, session);
+        if (redirect != null) {
+            return redirect;
         }
 
         ArrayList<Plato> traerPlatos = platodao.traerplatos();
@@ -183,17 +182,9 @@ public class RestController {
 
     @GetMapping("/mesas")
     public String mesa(Model modelo, HttpServletResponse response, HttpSession session) {
-        response.setHeader("Authorization", "Bearer " +
-                session.getAttribute("token"));
-
-        if (session.getAttribute("token") != null) {
-            roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
-            Rol rol = roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
-            if (rol.getNombre().equals("USER")) {
-                return "redirect:/index";
-            }
-        } else {
-            return "redirect:/index";
+        String redirect = soloadmins(modelo, response, session);
+        if (redirect != null) {
+            return redirect;
         }
         ArrayList<Mesa> traermesas = mesadao.traerMesas();
         modelo.addAttribute("mesas", traermesas);
@@ -201,40 +192,74 @@ public class RestController {
     }
 
     @GetMapping("/success")
-    public String success() {
+    public String success(Model modelo, HttpServletResponse response, HttpSession session) {
+
+        response.setHeader("Authorization", "Bearer " +
+                session.getAttribute("token"));
+
         return "sucess";
     }
 
     @GetMapping("/reservas")
     public String reservas(Model modelo, HttpServletResponse response, HttpSession session) {
-        response.setHeader("Authorization", "Bearer " +
-                session.getAttribute("token"));
-
-        if (session.getAttribute("token") != null) {
-            roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
-            Rol rol = roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
-            if (rol.getNombre().equals("USER")) {
-                return "redirect:/index";
-            }
-        } else {
-            return "redirect:/index";
+        String redirect = soloadmins(modelo, response, session);
+        if (redirect != null) {
+            return redirect;
         }
-
-        List<Reserva> listareserva = reservadao.traerreserva();
+        // Obtenemos las reservas atendidas
         List<Reserva> listareservatendida = reservadao.atendido();
-        ZonedDateTime fechaactual = ZonedDateTime.now(ZoneId.of("America/Lima"));
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        List<Reserva> allreservas = reservarepository.findAll();
+        // Usamos LocalDate para obtener la fecha actual
+        LocalDate fechaActual = LocalDate.now(ZoneId.of("America/Lima"));
 
+        // Traemos las reservas filtradas por la fecha actual
+        List<Reserva> listareserva = reservadao.traerreserva(fechaActual);
+
+        modelo.addAttribute("todasReservas", allreservas);
         modelo.addAttribute("nombre", session.getAttribute("username"));
         modelo.addAttribute("reservas", listareserva);
-        modelo.addAttribute("fechaactual", fechaactual.format(formato));
+        modelo.addAttribute("fechaactual", fechaActual);
         modelo.addAttribute("reservasatendidas", listareservatendida);
         return "tablareservas";
     }
 
     @GetMapping("/misreservas")
-    public String misreservas() {
+    public String misreservas(Model modelo, HttpServletResponse response, HttpSession session) {
+
+        if (session.getAttribute("token") != null) {
+            response.setHeader("Authorization", "Bearer " +
+                    session.getAttribute("token"));
+            Usuario usuario = usuarioRepository.findByCorreo(jwtUtil.getemail((String) session.getAttribute("token")));
+
+            if (usuario == null) {
+                return "redirect:/index";
+            }
+            List<Reserva> reservauser = reservarepository.findReservabyusuario(usuario.getId_usuario());
+
+            modelo.addAttribute("reservas", reservauser);
+        } else {
+
+            return "redirect:/index";
+        }
+
         return "misreservas";
+    }
+
+    @GetMapping("/verificacion")
+    public String verificacion() {
+
+        return "verificacion";
+    }
+
+    @GetMapping("/usuarios")
+    public String Usuarios(Model modelo, HttpServletResponse response, HttpSession session) {
+        String redirect = soloadmins(modelo, response, session);
+        if (redirect != null) {
+            return redirect;
+        }
+        List<Usuario> listadousuarios = usuarioRepository.findAll();
+        modelo.addAttribute("usuarios", listadousuarios);
+        return "tablausuario";
     }
 
     @PostMapping("/cerrar")
@@ -262,14 +287,39 @@ public class RestController {
             modelo.addAttribute("pedidos", pedido);
             modelo.addAttribute("platos", listaplato);
         }
-
-        // for (Pedido pedido2 : pedido) {
-        // ArrayList<Plato> plato = (ArrayList<Plato>) pedido2.id_plato;
-        // }
-
-        // modelo.addAttribute("platos", plato);
-
         return "pedidos";
+    }
+
+    @GetMapping("/pedidos")
+    public String pedidos(Model modelo, HttpServletResponse response, HttpSession session) {
+        String redirect = soloadmins(modelo, response, session);
+        if (redirect != null) {
+            return redirect;
+        }
+        List<Pedido> pedido = pedidorepository.ObtenerPedidosespera();
+        for (Pedido pedido1 : pedido) {
+            pedido1.calcularTotal();
+        }
+        List<Pedido> pedidosatendidos = pedidorepository.ObtenerPedidosatendidos();
+        modelo.addAttribute("pedidos", pedido);
+        modelo.addAttribute("pedidosatendidos", pedidosatendidos);
+        return "tablapedidos";
+    }
+
+    public String soloadmins(Model modelo, HttpServletResponse response, HttpSession session) {
+        response.setHeader("Authorization", "Bearer " +
+                session.getAttribute("token"));
+        if (session.getAttribute("token") != null) {
+            roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
+            Rol rol = roldao.findByNombre(jwtUtil.getrol((String) session.getAttribute("token")));
+            if (rol.getNombre().equals("USER")) {
+                return "redirect:/index";
+            }
+        } else {
+            return "redirect:/index";
+        }
+        return null;
+
     }
 
     @GetMapping("/checkout")

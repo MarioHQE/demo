@@ -15,10 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,7 +46,8 @@ public class Usuarioimpl implements UsuarioService {
 
     @Autowired
     private jwtUtil jwtUtil;
-
+    @Autowired
+    private JavaMailSender mailSender;
     @Autowired
     private UsuarioRepository usuariodao;
 
@@ -53,6 +57,7 @@ public class Usuarioimpl implements UsuarioService {
 
     }
 
+    @SuppressWarnings("null")
     @Override
     public String signup(Map<String, String> requesmap) {
         if (validatesignup(requesmap)) {
@@ -62,13 +67,30 @@ public class Usuarioimpl implements UsuarioService {
             requesmap.put("contrasena", passwordEncoder.encode(requesmap.get("contrasena")));
 
             if (Objects.isNull(usuario)) {
-                usuariodao.save(traerusuario(requesmap));
+                String verificationCode = generateVerificationCode();
+                requesmap.put("verificationCode", verificationCode);
+                Usuario usuario2 = traerusuario(requesmap);
+                usuario2.setVerificationCode(verificationCode);
+                usuariodao.save(usuario2);
+                enviarCodigoVerificacion(traerusuario(requesmap).getEmail(), verificationCode);
                 return "Se ha registrado correctamente";
             } else {
                 return "El usuario ya existe";
             }
         }
         return "No se ha podido registrar";
+    }
+
+    private void enviarCodigoVerificacion(String email, String codigo) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Código de verificación");
+        message.setText("Tu código de verificación es: " + codigo);
+        mailSender.send(message);
+    }
+
+    private String generateVerificationCode() {
+        return UUID.randomUUID().toString().substring(0, 6); // Código de 6 caracteres
     }
 
     private boolean validatesignup(Map<String, String> requesmap) {
@@ -96,7 +118,7 @@ public class Usuarioimpl implements UsuarioService {
         usuario.setTelefono(requesmap.get("telefono"));
         usuario.setEmail(requesmap.get("email"));
         usuario.setRol(rol);
-        usuario.setStatus("true");
+        usuario.setStatus("false");
         return usuario;
     }
 
@@ -124,7 +146,7 @@ public class Usuarioimpl implements UsuarioService {
                             HttpStatus.OK);
                 } else {
                     return new ResponseEntity<String>(
-                            "{\"mensaje\" : \"" + "Espere la aprobacion del administrador " + "\"}",
+                            "{\"mensaje\" : \"" + "Falta Verificar el correo " + "\"}",
                             HttpStatus.BAD_REQUEST);
                 }
 
@@ -136,6 +158,60 @@ public class Usuarioimpl implements UsuarioService {
         return new ResponseEntity<String>("{\"mensaje\" : \"" + "Credenciales incorrectas " + "\"}",
                 HttpStatus.BAD_REQUEST);
 
+    }
+
+    @Override
+    public ResponseEntity<String> actualizar(Map<String, String> requesmap) {
+        // Validar que el mapa contiene el ID del usuario
+        String idUsuarioStr = requesmap.get("id_usuario");
+        if (idUsuarioStr == null || idUsuarioStr.isEmpty()) {
+            return new ResponseEntity<>("El ID del usuario es requerido", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            // Convertir el ID a entero
+            int idUsuario = Integer.parseInt(idUsuarioStr);
+
+            // Buscar el usuario por ID
+            Usuario usuario = usuariodao.findById(idUsuario).orElse(null);
+
+            if (usuario != null) {
+                // Actualizar campos si están presentes en el mapa
+                if (requesmap.containsKey("nombre")) {
+                    usuario.setNombre(requesmap.get("nombre"));
+                }
+                if (requesmap.containsKey("telefono")) {
+                    usuario.setTelefono(requesmap.get("telefono"));
+                }
+                if (requesmap.containsKey("email")) {
+                    usuario.setEmail(requesmap.get("email"));
+                }
+                if (requesmap.containsKey("contrasena")) {
+                    usuario.setContrasena(passwordEncoder.encode(requesmap.get("contrasena")));
+                }
+
+                // Guardar el usuario actualizado
+                usuariodao.save(usuario);
+                return new ResponseEntity<>("Usuario actualizado correctamente", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+            }
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>("ID del usuario inválido", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al actualizar el usuario", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> eliminarUsuario(int idUsuario) {
+        Usuario usuario = usuariodao.findById(idUsuario).orElse(null);
+
+        if (usuario != null) {
+            usuariodao.delete(usuario);
+            return new ResponseEntity<>("Usuario eliminado correctamente", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
     }
 
 }

@@ -18,6 +18,10 @@ import com.example.demo.entity.Pedido;
 import com.example.demo.entity.PedidoPlato;
 import com.example.demo.entity.Plato;
 import com.example.demo.entity.Usuario;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Refund;
+import com.stripe.param.RefundCreateParams;
 
 @Service
 public class pedidoimpl implements pedidoservice {
@@ -80,7 +84,6 @@ public class pedidoimpl implements pedidoservice {
         for (Pedido pedidos : pedido) {
             pedidos.calcularTotal();
             pedidorepo.save(pedidos);
-            System.out.println(pedidos);
         }
         if (pedido == null) {
             return new ArrayList<>();
@@ -156,6 +159,38 @@ public class pedidoimpl implements pedidoservice {
         }
         return ResponseEntity.ok("Plato eliminado del pedido correctamente");
 
+    }
+
+    public ResponseEntity<String> actualizarEstado(Map<String, String> request) {
+        String idString = request.get("id_pedido");
+        Pedido pedido = pedidorepo.findById(Integer.parseInt(idString)).orElse(null);
+        if (Objects.isNull(pedido)) {
+            return ResponseEntity.badRequest().body("Pedido no encontrado");
+        }
+        pedido.setEstado("atendido");
+        pedidorepo.save(pedido);
+        return ResponseEntity.ok("Pedido actualizado correctamente");
+    }
+
+    @Override
+    public ResponseEntity<String> rembolso(Map<String, String> requesmap, String secretkey) throws StripeException {
+        String idString = requesmap.get("id_pedido");
+
+        Pedido pedido = pedidorepo.findById(Integer.parseInt(idString)).orElse(null);
+        if (Objects.isNull(pedido)) {
+            return ResponseEntity.badRequest().body("Pedido no encontrado");
+        }
+        Stripe.apiKey = secretkey;
+        RefundCreateParams params = RefundCreateParams.builder().setPaymentIntent(pedido.getId_pago()).build();
+        Refund refund = Refund.create(params);
+        if (refund.getStatus().equals("succeeded")) {
+
+            pedido.setEstado("REMBOLSADO");
+            pedidorepo.save(pedido);
+            return ResponseEntity.ok("Rembolso realizado correctamente");
+        } else {
+            return ResponseEntity.status(500).body("Error al realizar el rembolso");
+        }
     }
 
 }

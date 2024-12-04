@@ -43,10 +43,11 @@ public class SecurityConfig {
                         "/login_admin", "/regform", "/chef", "/contacto", "/carta", "/empleado/registrar", "/carrito",
                         "/stripe/paymentinten", "/stripe/confirm/**", "/stripe/**", "/success", "/pedido/**",
                         "/mispedidos/**", "/mispedidos", "/pedido/agregar-platos", "/create-checkout-session",
-                        "/pedido/create-checkout-session", "/misreservas", "/pedido/webhook")
+                        "/pedido/create-checkout-session", "/misreservas", "/pedido/webhook", "/reserva/eliminar",
+                        "/usuarios", "/pedidos", "/verificacion", "/empleado/verificar")
                 .permitAll()
                 .requestMatchers("/prueba", "menu_login", "/platos", "/hola", "/img/**",
-                        "/css/**", "/js/**", "/favicon.ico", "/uploads/**", "/reserva", "/reservas", "/platos",
+                        "/css/**", "/js/**", "/favicon.ico", "/uploads/**", "/reserva/**", "/reservas", "/platos",
                         "/mesas")
                 .permitAll().anyRequest().authenticated()
                 .and()

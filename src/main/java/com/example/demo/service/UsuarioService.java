@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface UsuarioService {
+    public ResponseEntity<String> actualizar(Map<String, String> requesmap);
 
     public List<Usuario> traerusuarios();
 
@@ -22,4 +23,5 @@ public interface UsuarioService {
     public ResponseEntity<String> login(Map<String, String> requesmap, HttpSession session,
             HttpServletResponse response);
 
+    public ResponseEntity<String> eliminarUsuario(int idUsuario);
 }

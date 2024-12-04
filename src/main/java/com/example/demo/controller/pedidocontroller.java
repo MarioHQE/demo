@@ -6,6 +6,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +18,7 @@ import com.example.demo.service.pagoimpl;
 import com.example.demo.service.pedidoimpl;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
+import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
 import com.stripe.net.Webhook;
@@ -25,8 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Slf4j
 @Controller
@@ -34,6 +35,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class pedidocontroller {
     @Value("${stripe.key.secret}")
     String secretkey;
+    @Autowired
+    private JavaMailSender mailSender;
     @Autowired
     private pedidorepository pedidodao;
     @Autowired
@@ -67,25 +70,20 @@ public class pedidocontroller {
         return pagoimpl.sesionpay(mapeo);
     }
 
-    @GetMapping("/pagado/{id}")
-    public String pagado(@PathVariable("id") int idPedido) {
+    @PostMapping("/actualizarEstado")
+    public ResponseEntity<String> actualizarEstado(@RequestBody Map<String, String> request) {
 
-        // Pedido cambio = pedidodao.findById(idPedido).orElse(null);
-        // if (cambio != null) {
-        // cambio.setEstado("PAGADO");
-        // pedidodao.save(cambio);
-        // }
-
-        // TODO: update
-        return "redirect:/success";
+        return pedidoimpl.actualizarEstado(request);
     }
 
     @PostMapping("/webhook")
     public ResponseEntity<String> handleStripeWebhook(@RequestBody String Payload,
             @RequestHeader("Stripe-Signature") String sigHeader) {
         Stripe.apiKey = secretkey;
-        String endpoint = "whsec_9850a314cfa962c23f3616368e571af42d3d78f675cac0825c67d2d5bdffbee5";
+        String endpoint = "whsec_c6tISUjzdoPY0dt89vYDKqf3Ix6QRjs9";
         Event event;
+        SimpleMailMessage mensaje = new SimpleMailMessage();
+
         try {
             event = Webhook.constructEvent(Payload, sigHeader, endpoint);
 
@@ -95,12 +93,16 @@ public class pedidocontroller {
                 log.info("Id_pedido" + intent.getMetadata().get("pedido_id"));
                 String pedidoid = intent.getMetadata().get("pedido_id");
                 Pedido pedido = pedidodao.findById(Integer.parseInt(pedidoid)).orElse(null);
-                log.info("Pedido este" + pedido);
 
                 if (pedido != null) {
                     pedido.setEstado("PAGADO");
+                    pedido.setId_pago(intent.getId());
                     pedidodao.save(pedido);
-
+                    mensaje.setTo(pedido.getId_usuario().getEmail());
+                    mensaje.setSubject("Pedido pagado");
+                    mensaje.setText("El pedido con id: " + pedido.getId_pedido() + " fue pagado exitosamente");
+                    mensaje.setFrom("marioelpro08@gmail.gmail");
+                    mailSender.send(mensaje);
                 }
 
             }
@@ -111,6 +113,12 @@ public class pedidocontroller {
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/rembolso")
+    public ResponseEntity<String> rembolso(@RequestBody Map<String, String> requesmap) throws StripeException {
+        //
+        return pedidoimpl.rembolso(requesmap, secretkey);
     }
 
 }

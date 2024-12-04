@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Null;
 import lombok.Data;
 
 @NamedQuery(name = "Plato.findById", query = "SELECT p From Plato p WHERE p.id_plato =:id")

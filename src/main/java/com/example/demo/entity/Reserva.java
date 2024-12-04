@@ -20,7 +20,8 @@ import lombok.Data;
 @Entity
 @DynamicInsert
 @DynamicUpdate
-@NamedQuery(name = "Reserva.findbyestado", query = "SELECT r FROM Reserva r WHERE r.estado='pendiente' OR r.estado='confirmado' ORDER BY DATE(r.fecha), TIME(r.fecha)")
+@NamedQuery(name = "Reserva.findReservabyusuario", query = "SELECT r from Reserva r where r.estado='pendiente' AND  r.usuario.id=:id_usuario")
+@NamedQuery(name = "Reserva.findbyestado", query = "SELECT r FROM Reserva r WHERE (r.estado='pendiente' OR r.estado='confirmado') AND FUNCTION('DATE', r.fecha) = :fecha ORDER BY r.fecha")
 @NamedQuery(name = "Reserva.atendidos", query = "SELECT r FROM Reserva r WHERE r.estado = 'atendido' ORDER BY DATE(r.fecha), TIME(r.fecha)")
 @Table(name = "reserva")
 @Data
@@ -29,7 +30,7 @@ public class Reserva {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_reserva")
-    private Integer idReserva;
+    private int idReserva;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")

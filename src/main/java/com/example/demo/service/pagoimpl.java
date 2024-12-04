@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dao.pedidorepository;
 import com.example.demo.entity.Pedido;
 import com.example.demo.entity.PedidoPlato;
-import com.example.demo.entity.Plato;
 import com.example.demo.stripe.pago;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
@@ -59,8 +58,9 @@ public class pagoimpl implements pagoservice {
 
         // Confirma el PaymentIntent con un método de pago específico
         PaymentIntentConfirmParams params = PaymentIntentConfirmParams.builder()
-                .setPaymentMethod("pm_card_visa").setReturnUrl("http://localhost:3600/index") // Asegúrate de que este
-                                                                                              // método de pago esté
+                .setPaymentMethod("pm_card_visa").setReturnUrl("http://52.91.172.181:3600/index") // Asegúrate de que
+                                                                                                  // este
+                // método de pago esté
                 // registrado en Stripe
                 .build();
 
@@ -96,7 +96,6 @@ public class pagoimpl implements pagoservice {
                 .orElse(null);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ResponseEntity<Map<String, String>> sesionpay(Map<String, Object> mapeo) {
         try {
@@ -132,8 +131,8 @@ public class pagoimpl implements pagoservice {
                     .setMode(SessionCreateParams.Mode.PAYMENT).setCustomerEmail((String) mapeo.get("nombre"))
                     .setPaymentIntentData(SessionCreateParams.PaymentIntentData.builder().putMetadata("pedido_id",
                             String.valueOf(urlsucces)).build())
-                    .setSuccessUrl("http://localhost:3600/pedido/pagado/" + urlsucces)
-                    .setCancelUrl("http://localhost:3600/cancel") // URL de cancelación
+                    .setSuccessUrl("http://52.91.172.181/success")
+                    .setCancelUrl("http://52.91.172.181/index") // URL de cancelación
                     .addAllLineItem((List<LineItem>) lineitem)
                     .build();
 

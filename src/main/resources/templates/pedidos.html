@@ -30,12 +30,16 @@
 <body>
     <div class="container">
         <h1>Mis Pedidos</h1>
+        <!-- Verifica si la lista de pedidos está vacía -->
+        <div th:if="${#lists.isEmpty(pedidos)}" class="alert alert-warning" role="alert">
+            No tienes pedidos disponibles.
+        </div>
 
+        <!-- Si hay pedidos, se mostrarán normalmente -->
         <div class="pedido" th:each="pedido : ${pedidos}">
             <div class="titulo">Pedido [[${pedido.id_pedido}]]</div>
             <p th:text="${pedido.fecha}"></p>
             <p th:text="${pedido.estado}"></p>
-
             <table>
                 <thead>
                     <tr>
@@ -59,8 +63,8 @@
                         <td th:text="${plato.cantidad}"></td>
                         <td>
                             <button class="btn btn-danger btn-delete" data-bs-toggle="modal"
-                                data-bs-target="#eliminarPlatoModal" th:attr="data-plato-id=${plato.plato.id_plato},
-                                data-pedidoplato-id=${plato.idPedidoPlato}">
+                                data-bs-target="#eliminarPlatoModal"
+                                th:attr="data-plato-id=${plato.plato.id_plato}, data-pedidoplato-id=${plato.idPedidoPlato}">
                                 Eliminar
                             </button>
                         </td>
@@ -71,16 +75,18 @@
                     </tr>
                 </tbody>
             </table>
-            <!-- <p>Total: <span th:text="${pedido.total}"></span></p> -->
             <button class="btn btn-primary open-modal" data-bs-toggle="modal" data-bs-target="#platosModal"
                 th:attr="data-pedido-id=${pedido.id_pedido}">Agregar más platos</button>
             <form id="checkoutForm">
                 <input type="hidden" name="email" th:value="${email}">
                 <input type="hidden" name="id_pedido" th:value="${pedido.id_pedido}">
-                <button type="button" class="btn btn-success btn-checkout"
+                <button type="button" class="btn btn-success btn-checkout" th:if="${pedido.estado=='ESPERA'}"
                     th:attr="data-pedido-id=${pedido.id_pedido}">Checkout</button>
             </form>
         </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="/index" class="btn btn-secondary">Volver al inicio</a>
     </div>
 
 
@@ -221,13 +227,13 @@
                 item.className = "list-group-item d-flex justify-content-between align-items-center";
                 item.innerHTML = `
                     ${plato.nombre} (x${plato.cantidad}) - $${plato.precio}
-                    <button class="btn btn-danger btn-sm eliminar-plato" data-id="${plato.id}">Eliminar</button>
+                    <button class="btn btn-danger btn-sm eliminar-plato-modal" data-id="${plato.id}">Eliminar</button>
                 `;
                 lista.appendChild(item);
             });
 
             // Manejo del botón "Eliminar"
-            document.querySelectorAll(".eliminar-plato").forEach(button => {
+            document.querySelectorAll(".eliminar-plato-modal").forEach(button => {
                 button.addEventListener("click", () => {
                     const id = button.getAttribute("data-id");
                     const index = platosSeleccionados.findIndex(plato => plato.id === id);
@@ -260,6 +266,7 @@
                         alert("Platos agregados al pedido con éxito.");
                         const modal = bootstrap.Modal.getInstance(document.getElementById("platosModal"));
                         modal.hide();
+                        window.location = "/mispedidos";
                     } else {
                         alert("Error al agregar platos al pedido.");
                     }
@@ -283,7 +290,7 @@
             const pedidoPlatoId = $("#pedidoPlatoId").val();
 
             $.ajax({
-                url: "http://localhost:3600/pedido/eliminar-plato",
+                url: "http://52.91.172.181/pedido/eliminar-plato",
                 type: "POST",
                 data: { id_plato: platoId, id_pedidoplato: pedidoPlatoId },
                 success: function (response) {

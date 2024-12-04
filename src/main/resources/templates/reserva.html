@@ -72,8 +72,7 @@
                     <h3>Completa tus datos y haz clic en "Ir al último paso"</h3>
                     <div class="mb-3 mt-3">
                         <label for="name" class="form-label">Nombre:</label>
-                        <input type="text" class="form-control" name="name" value="<?php echo isset($_SESSION["
-                            nombre"]) ? $_SESSION["nombre"] : "" ?>" required>
+                        <input type="text" class="form-control" name="name" value="" required>
                     </div>
                     <div class="mb-3 mt-3">
                         <label for="lastname" class="form-label">Apellidos:</label>
@@ -110,7 +109,7 @@
                     </div>
                     <div class="d-grid mt-3">
                         <button type="button" class="btn btn-outline-dark btn-block"
-                            onclick="window.location.href='index.php'">Volver</button>
+                            onclick="window.location.href='index'">Volver</button>
                     </div>
                     <div id="message" class="mt-3"></div>
 
@@ -131,7 +130,7 @@
                 if (cantidad && fecha && hora) {
                     $.ajax({
                         type: 'POST',
-                        url: 'http://localhost:3600/mesa/traer',
+                        url: 'http://52.91.172.181/mesa/traer',
                         headers: {
                             'Authorization': 'Bearer ' + token
                         },
@@ -171,14 +170,16 @@
 
             $.ajax({
                 type: 'POST',
-                url: 'http://localhost:3600/reserva/crear',
+                url: 'http://52.91.172.181/reserva/crear',
                 data: formData,
                 headers: {
                     'Authorization': 'Bearer ' + token
                 },
                 success: function (response) {
                     $('#message').html('<div class="alert alert-success">' + response + '</div>');
+
                     // Opcionalmente, puedes limpiar el formulario aquí
+                    $(this).trigger("reset");
                 },
                 error: function (xhr) {
                     $('#message').html('<div class="alert alert-danger">' + xhr.responseText + '</div>');

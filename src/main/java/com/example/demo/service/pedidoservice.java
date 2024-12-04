@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.Pedido;
+import com.stripe.exception.StripeException;
 
 @Service
 public interface pedidoservice {
@@ -19,5 +20,9 @@ public interface pedidoservice {
     public ResponseEntity<String> agregarplatos(Map<String, Object> params);
 
     public ResponseEntity<String> eliminarplatopedido(int id_plato, int id_pedidoplato);
+
+    public ResponseEntity<String> actualizarEstado(Map<String, String> request);
+
+    public ResponseEntity rembolso(Map<String, String> requesmap, String secretkey) throws StripeException;
 
 }

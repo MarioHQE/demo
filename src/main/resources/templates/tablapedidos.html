@@ -11,8 +11,7 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="css/menu_login.css">
-    <script src="js/eliminar.js"></script>
-    <script defer src="js/actuempleado.js"></script>
+
 </head>
 
 <body>
@@ -68,78 +67,61 @@
                 <form method="POST">
                     <div class="row align-items-center mb-3">
                         <div class="col-sm-4">
-                            <h3>Lista de Reservas</h3>
+                            <h3>Lista de Pedidos</h3>
                         </div>
                     </div>
                 </form>
                 <h1 th:if="${nombre !=null}">Bienvenido, [[${nombre}]]</h1>
 
-                <div id="todas-las-reservas">
-                    <h4>Listado de Todas las Reservas</h4>
-                    <table class="table table-bordered text-center">
-                        <thead>
-                            <tr>
-                                <th>N°</th>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>Hora</th>
-                                <th>Correo</th>
-                                <th>Teléfono</th>
-                                <th>Estado</th>
-                                <th>Número de mesa</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="reserva : ${todasReservas}">
-                                <td th:text="${reserva.idReserva}"></td>
-                                <td th:text="${reserva.Nombre}"></td>
-                                <td th:text="${reserva.apellido}"></td>
-                                <td th:text="${reserva.fecha}"></td>
-                                <td th:text="${reserva.correo}"></td>
-                                <td th:text="${reserva.telefono}"></td>
-                                <td th:text="${reserva.estado}"></td>
-                                <td th:text="${reserva.Mesa.nroMesa}"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
                 <div id="reservas-por-dia">
-                    <h4>Reservas para el día: [[${fechaactual}]]</h4>
                     <table class="table table-bordered text-center">
                         <thead>
                             <tr>
-                                <th>N°</th>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>Hora</th>
-                                <th>Correo</th>
-                                <th>Teléfono</th>
+                                <th>N° de Pedido</th>
+                                <th>Usuario</th>
+                                <th>Correo de Usuario</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th>Platos</th>
                                 <th>Estado</th>
-                                <th>Número de mesa</th>
-                                <th>Atender</th>
+                                <th>Acciones</th>
+                                <th>Rembolsar</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Filas de reservas vacías -->
-                            <tr th:each=" reserva : ${reservas}">
-                                <td th:text="${reserva.idReserva}"></td>
-                                <td th:text="${reserva.Nombre}"></td>
-                                <td th:text="${reserva.apellido}"></td>
-                                <td th:text="${reserva.fecha}"></td>
-                                <td th:text="${reserva.correo}"></td>
-                                <td th:text="${reserva.telefono}"></td>
-                                <td th:text="${reserva.estado}"></td>
-                                <td th:text="${reserva.Mesa.nroMesa}"></td>
+                            <!-- Filas de reservas -->
+                            <tr th:each="pedido : ${pedidos}">
+                                <td th:text="${pedido.id_pedido}"></td>
+                                <td th:text="${pedido.id_usuario.nombre}"></td>
+                                <td th:text="${pedido.id_usuario.email}"></td>
+                                <td th:text="${#temporals.format(pedido.fecha, 'yyyy-MM-dd HH:mm')}"></td>
+                                <td th:text="${pedido.total}"></td>
+                                <td>
+                                    <ul>
+                                        <li th:each="pedidoPlato : ${pedido.pedidoPlatos}">
+                                            <span th:text="${pedidoPlato.plato.nombre}">Nombre del plato</span> -
+                                            <span th:text="${pedidoPlato.cantidad}">Cantidad</span>
+                                        </li>
+                                    </ul>
+                                </td>
+                                <td th:text="${pedido.estado}"></td>
                                 <td>
                                     <button class="btn btn-primary"
-                                        th:onclick="cambiarEstadoAtendido([[${reserva.idReserva}]])">
+                                        th:onclick="cambiarEstadoAtendido([[${pedido.id_pedido}]])">
                                         Atender
+                                    </button>
+                                </td>
+                                <td>
+                                    <!-- Other buttons like "Atender" -->
+                                    <button class="btn btn-danger"
+                                        th:onclick="rembolsarPedido([[${pedido.id_pedido}]])">
+                                        Rembolsar
                                     </button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+
                 </div>
 
                 <div id="reservas-atendidas">
@@ -148,34 +130,33 @@
                     <table class="table table-bordered text-center">
                         <thead>
                             <tr>
-                                <th>N°</th>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>Hora</th>
-                                <th>Correo</th>
-                                <th>Teléfono</th>
-                                <th>Estado</th>
-                                <th>Número de mesa</th>
-                                <th>Atender</th>
+                                <th>N° de Pedido</th>
+                                <th>Usuario</th>
+                                <th>Correo de Usuario</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Filas de reservas atendidas vacías -->
-                            <tr th:each=" reserva: ${reservasatendidas}">
-                                <td th:text="${reserva.idReserva}"></td>
-                                <td th:text="${reserva.Nombre}"></td>
-                                <td th:text="${reserva.apellido}"></td>
-                                <td th:text="${reserva.fecha}"></td>
-                                <td th:text="${reserva.correo}"></td>
-                                <td th:text="${reserva.telefono}"></td>
-                                <td th:text="${reserva.estado}"></td>
-                                <td th:text="${reserva.Mesa.nroMesa}"></td>
+                            <tr th:each="pedido : ${pedidosatendidos}">
+                                <td th:text="${pedido.id_pedido}"></td>
+                                <td th:text="${pedido.id_usuario.nombre}"></td>
+                                <td th:text="${pedido.id_usuario.email}"></td>
+                                <td th:text="${#temporals.format(pedido.fecha, 'yyyy-MM-dd HH:mm')}"></td>
+                                <td th:text="${pedido.total}"></td>
                                 <td>
-                                    <button class="btn btn-primary"
-                                        th:onclick="cambiarEstadoAtendido([[${reserva.idReserva}]])">
-                                        Atender
-                                    </button>
+                                    <ul>
+                                        <li th:each="pedidoPlato : ${pedido.pedidoPlatos}">
+                                            <span th:text="${pedidoPlato.plato.nombre}">Nombre del plato</span> -
+                                            <span th:text="${pedidoPlato.cantidad}">Cantidad</span>
+                                        </li>
+                                    </ul>
                                 </td>
+                                <td th:text="${pedido.estado}"></td>
+
+
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -184,7 +165,6 @@
     </div>
 
     <script src="js/menu_login.js"></script>
-    <script src="js/actuplato.js"></script>
     <script>
         var token = '[[${session.token}]]';
         $('#logout-btn').on('click', function () {
@@ -211,12 +191,15 @@
                 });
             });
         });
-        function cambiarEstadoAtendido(idReserva) {
+        function cambiarEstadoAtendido(idPedido) {
             $.ajax({
-                url: "http://52.91.172.181/reserva/actualizarEstado",
+                url: "http://52.91.172.181/pedido/actualizarEstado",
                 type: "POST",
                 contentType: "application/json",
-                data: JSON.stringify({ idReserva: idReserva }),
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                data: JSON.stringify({ id_pedido: idPedido }),
                 success: function (response) {
                     alert(response);
                     // Opcional: Recargar la lista de reservas después de la actualización
@@ -224,6 +207,26 @@
                 },
                 error: function (xhr, status, error) {
                     alert("Error al cambiar el estado: " + xhr.responseText);
+                }
+            });
+        }
+        function rembolsarPedido(idPedido) {
+            $.ajax({
+                url: 'http://52.91.172.181/pedido/rembolso',  // Adjust the URL if necessary
+                method: 'POST',
+                contentType: "application/json",
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                data: JSON.stringify({
+                    id_pedido: idPedido  // You can send any other data necessary
+                }),
+                success: function (response) {
+                    alert(response);
+
+                },
+                error: function (err) {
+                    alert("Error al realizar el rembolso");
                 }
             });
         }

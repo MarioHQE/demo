@@ -16,7 +16,7 @@
         $('#verificar-rol-btn').on('click', function () {
             $.ajax({
                 type: "POST",
-                url: "http://localhost:3600/empleado/verificarRol",
+                url: "http://52.91.172.181/empleado/verificarRol",
                 dataType: "json",
                 headers: {
                     'Authorization': 'Bearer ' + token
@@ -33,7 +33,7 @@
         $('#logout-btn').on('click', function () {
             $.ajax({
                 type: "POST",
-                url: "http://localhost:3600/cerrar",
+                url: "http://52.91.172.181/cerrar",
                 headers: {
                     'Authorization': 'Bearer ' + token
                 },
